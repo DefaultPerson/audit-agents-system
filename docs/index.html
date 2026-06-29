@@ -1,1032 +1,1126 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="blueprint">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="color-scheme" content="dark" />
-<title>Autonomous Audit Agents — A method for researching closed-source EVM contracts</title>
-<meta name="description" content="An autonomous AI pipeline that researches vulnerabilities in closed-source EVM smart contracts: a domain-agnostic Researcher ⇄ Skeptic debate behind an evidence-gated consensus, validated on a pinned fork. A concept demonstration." />
-<meta property="og:title" content="Autonomous Audit Agents" />
-<meta property="og:description" content="A domain-agnostic autonomous research method for finding vulnerabilities in closed-source EVM contracts. Concept demonstration." />
+<title>How are so many bugs found this fast? — one conjecture</title>
+<meta name="description" content="Crypto theft surged to ~$3.4B in 2025. How are bugs in old, closed-source, never-audited EVM contracts found and drained so fast? An interactive engineering schematic lays out one plausible method: an autonomous, AI-driven Researcher ⇄ Skeptic research pipeline behind a deterministic evidence gate. A speculative concept demonstration — not a product, not an accusation." />
+<meta property="og:title" content="How are so many bugs found this fast? — one conjecture" />
+<meta property="og:description" content="An interactive schematic of one plausible method behind the surge in EVM exploits: an autonomous, evidence-gated AI research pipeline. A speculative concept demonstration." />
 <meta property="og:type" content="website" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --bg:            #06080d;
-    --bg-2:          #090d16;
-    --panel:         #0c121e;
-    --panel-2:       #0f1626;
-    --line:          rgba(120,150,200,.12);
-    --line-strong:   rgba(120,150,200,.24);
-    --ink:           #e8eefb;
-    --ink-soft:      #aab6cf;
-    --ink-mute:      #6b7791;
-    --cyan:          #22d3ee;
-    --cyan-soft:     #67e8f9;
-    --violet:        #a78bfa;
-    --violet-soft:   #c4b5fd;
-    --green:         #34d399;
-    --amber:         #fbbf24;
-    --rose:          #fb7185;
-    --glow-cyan:     rgba(34,211,238,.55);
-    --glow-violet:   rgba(167,139,250,.5);
-    --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-    --maxw: 1180px;
-    --r: 16px;
-    --ease: cubic-bezier(.22,.61,.36,1);
+    /* blueprint / phosphor schematic palette — deliberately NOT the cyan+violet SaaS gradient */
+    --paper:      #0a1018;          /* deep blueprint ink */
+    --paper-2:    #0d141e;
+    --panel:      #0f1824;
+    --panel-2:    #122031;
+    --grid:       rgba(86, 140, 170, 0.085);
+    --grid-major: rgba(86, 140, 170, 0.16);
+    --rule:       rgba(120, 165, 190, 0.18);
+    --rule-soft:  rgba(120, 165, 190, 0.10);
+    --ink:        #d6e6ef;          /* light cyanish ink on blueprint */
+    --ink-soft:   #9db4c4;
+    --ink-mute:   #5f7689;
+    --phos:       #6fe3a8;          /* phosphor green — the "live / pass" signal */
+    --phos-dim:   #3f9d72;
+    --amber:      #f2b65c;          /* annotations / caution */
+    --amber-dim:  #b3823c;
+    --blue:       #5ea9d6;          /* schematic line blue */
+    --blue-dim:   #3d7299;
+    --rust:       #e0795f;          /* reject / shut */
+    --rust-dim:   #a8523c;
+    --wire:       rgba(110, 160, 190, 0.45);
+
+    --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --maxw: 1240px;
+    --ease: cubic-bezier(.2,.7,.3,1);
   }
 
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
   body {
     margin: 0;
-    background: var(--bg);
     color: var(--ink);
     font-family: var(--sans);
-    font-size: 17px;
+    font-size: 16px;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     overflow-x: hidden;
+    background-color: var(--paper);
+    /* graph-paper blueprint grid */
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+      linear-gradient(var(--grid-major) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-major) 1px, transparent 1px),
+      radial-gradient(120% 80% at 50% -10%, rgba(94,169,214,.07), transparent 60%);
+    background-size: 26px 26px, 26px 26px, 130px 130px, 130px 130px, 100% 100%;
+    background-position: -1px -1px, -1px -1px, -1px -1px, -1px -1px, 0 0;
   }
   a { color: inherit; }
-  h1,h2,h3 { line-height: 1.1; letter-spacing: -.02em; margin: 0; font-weight: 800; }
+  h1,h2,h3 { margin: 0; line-height: 1.18; font-weight: 700; letter-spacing: -.01em; }
   p { margin: 0; }
-  ::selection { background: rgba(34,211,238,.3); color: #fff; }
+  ::selection { background: rgba(111,227,168,.28); color: #fff; }
+  :focus-visible { outline: 2px solid var(--phos); outline-offset: 3px; border-radius: 4px; }
 
-  /* ---------- layout ---------- */
-  .wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
-  section { position: relative; padding: clamp(72px, 11vh, 140px) 0; }
-  .eyebrow {
+  .wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 22px; }
+  .mono { font-family: var(--mono); }
+
+  /* ---- masthead: a drawing title-block, not a hero ---- */
+  .masthead {
+    border-bottom: 1px solid var(--rule);
+    background: linear-gradient(180deg, rgba(10,16,24,.86), rgba(10,16,24,.55));
+    backdrop-filter: blur(6px);
+    position: sticky; top: 0; z-index: 50;
+  }
+  .titleblock {
+    display: grid; grid-template-columns: auto 1fr auto; gap: 18px 24px; align-items: center;
+    padding: 12px 0;
+  }
+  .titleblock .mark { display: flex; align-items: center; gap: 11px; }
+  .titleblock .mark svg { width: 30px; height: 30px; flex: none; }
+  .titleblock .mark .nm { font-family: var(--mono); font-size: 13.5px; font-weight: 600; letter-spacing: .02em; }
+  .titleblock .mark .nm small { display: block; color: var(--ink-mute); font-weight: 500; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+  .titleblock .specs {
+    display: flex; flex-wrap: wrap; gap: 6px 16px; justify-self: center;
+    font-family: var(--mono); font-size: 11px; letter-spacing: .06em; color: var(--ink-mute);
+  }
+  .titleblock .specs b { color: var(--blue); font-weight: 600; }
+  .repo-link {
+    font-family: var(--mono); font-size: 12.5px; text-decoration: none; color: var(--ink-soft);
+    display: inline-flex; align-items: center; gap: 7px;
+    border: 1px solid var(--rule); border-radius: 7px; padding: 6px 11px;
+    transition: border-color .2s, color .2s, background .2s;
+  }
+  .repo-link:hover { border-color: var(--phos-dim); color: var(--ink); background: rgba(111,227,168,.06); }
+  @media (max-width: 820px) { .titleblock { grid-template-columns: 1fr auto; } .titleblock .specs { display: none; } }
+
+  /* ---- intro strip (terse annotation, NOT a marketing hero) ---- */
+  .intro { padding: 40px 0 14px; }
+  .intro .kicker {
+    font-family: var(--mono); font-size: 12px; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--phos-dim); margin-bottom: 14px;
+  }
+  .intro h1 { font-size: clamp(23px, 3.4vw, 36px); max-width: 21ch; }
+  .intro h1 .hi { color: var(--phos); }
+  .intro .sub { margin-top: 16px; color: var(--ink-soft); max-width: 70ch; font-size: clamp(15px, 1.6vw, 17px); }
+  .intro .note {
+    margin-top: 18px; font-family: var(--mono); font-size: 12.5px; color: var(--amber);
+    border-left: 2px solid var(--amber-dim); padding: 8px 0 8px 14px; max-width: 78ch; line-height: 1.55;
+  }
+  .intro .note b { color: var(--ink); font-weight: 600; }
+
+  /* ---- section scaffolding ---- */
+  section { padding: 34px 0; }
+  .sec-tag {
     display: inline-flex; align-items: center; gap: 9px;
-    font-family: var(--mono); font-size: 12.5px; letter-spacing: .18em;
-    text-transform: uppercase; color: var(--cyan-soft);
-    padding: 7px 14px; border: 1px solid var(--line-strong); border-radius: 999px;
-    background: rgba(34,211,238,.05);
+    font-family: var(--mono); font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--blue);
   }
-  .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan);
-    box-shadow: 0 0 10px var(--glow-cyan); }
-  .lead { color: var(--ink-soft); font-size: clamp(16px, 1.5vw, 19px); max-width: 62ch; }
-  .grad-text {
-    background: linear-gradient(100deg, var(--cyan) 0%, var(--violet) 55%, var(--cyan-soft) 100%);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
+  .sec-tag .ord {
+    display: inline-grid; place-items: center; width: 22px; height: 22px;
+    border: 1px solid var(--blue-dim); border-radius: 5px; color: var(--blue);
+    font-size: 11px; font-weight: 600;
   }
+  .sec-h { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin: 14px 0 6px; }
+  .sec-h h2 { font-size: clamp(20px, 2.6vw, 28px); }
+  .sec-lead { color: var(--ink-soft); max-width: 76ch; font-size: 15px; margin-top: 8px; }
 
-  /* ---------- nav ---------- */
-  .nav {
-    position: fixed; inset: 0 0 auto 0; z-index: 60;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 24px; backdrop-filter: blur(12px);
-    background: linear-gradient(180deg, rgba(6,8,13,.88), rgba(6,8,13,.4));
-    border-bottom: 1px solid transparent; transition: border-color .3s, background .3s;
-  }
-  .nav.scrolled { border-bottom-color: var(--line); background: rgba(6,8,13,.92); }
-  .nav .brand { display: flex; align-items: center; gap: 11px; font-weight: 700; letter-spacing: -.01em; }
-  .nav .brand .mark { width: 26px; height: 26px; flex: none; }
-  .nav .links { display: flex; align-items: center; gap: 26px; font-size: 14.5px; color: var(--ink-soft); }
-  .nav .links a { text-decoration: none; transition: color .2s; }
-  .nav .links a:hover { color: var(--ink); }
-  .nav .links a.repo {
-    color: var(--ink); border: 1px solid var(--line-strong); border-radius: 9px;
-    padding: 7px 14px; display: inline-flex; gap: 8px; align-items: center;
-    transition: border-color .2s, background .2s;
-  }
-  .nav .links a.repo:hover { border-color: var(--cyan); background: rgba(34,211,238,.07); }
-  @media (max-width: 760px) { .nav .links a:not(.repo) { display: none; } }
-
-  /* ---------- buttons ---------- */
-  .btn {
-    --b: var(--cyan);
-    display: inline-flex; align-items: center; gap: 10px; cursor: pointer;
-    font-family: var(--sans); font-weight: 600; font-size: 15.5px;
-    padding: 14px 22px; border-radius: 12px; text-decoration: none;
-    border: 1px solid transparent; transition: transform .18s var(--ease), box-shadow .25s, background .25s, border-color .25s;
-  }
-  .btn:active { transform: translateY(1px); }
-  .btn-primary {
-    color: #04121a; background: linear-gradient(180deg, var(--cyan-soft), var(--cyan));
-    box-shadow: 0 10px 34px -12px var(--glow-cyan), inset 0 1px 0 rgba(255,255,255,.4);
-  }
-  .btn-primary:hover { box-shadow: 0 16px 44px -10px var(--glow-cyan); transform: translateY(-2px); }
-  .btn-ghost { color: var(--ink); border-color: var(--line-strong); background: rgba(255,255,255,.02); }
-  .btn-ghost:hover { border-color: var(--cyan); background: rgba(34,211,238,.06); transform: translateY(-2px); }
-
-  /* ---------- hero ---------- */
-  #hero { min-height: 100vh; display: flex; align-items: center; padding-top: 96px; overflow: hidden; }
-  #bg-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; opacity: .85; }
-  .hero-veil {
-    position: absolute; inset: 0; z-index: 1; pointer-events: none;
-    background:
-      radial-gradient(70% 55% at 18% 8%, rgba(34,211,238,.16), transparent 60%),
-      radial-gradient(60% 60% at 88% 90%, rgba(167,139,250,.16), transparent 60%),
-      linear-gradient(180deg, transparent 55%, var(--bg) 100%);
-  }
-  #hero .wrap { position: relative; z-index: 2; }
-  .hero-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 56px; align-items: center; }
-  @media (max-width: 920px) { .hero-grid { grid-template-columns: 1fr; gap: 40px; } }
-  .h1 { font-size: clamp(40px, 6.4vw, 76px); font-weight: 800; letter-spacing: -.035em; }
-  .hero-tag { margin-top: 22px; font-size: clamp(17px, 2vw, 21px); color: var(--ink-soft); max-width: 56ch; }
-  .hero-cta { margin-top: 36px; display: flex; flex-wrap: wrap; gap: 14px; }
-  .hero-meta { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 10px; }
-  .pill {
-    font-family: var(--mono); font-size: 12.5px; color: var(--ink-soft);
-    padding: 6px 12px; border: 1px solid var(--line); border-radius: 8px;
-    background: rgba(255,255,255,.02);
-  }
-  .pill b { color: var(--cyan-soft); font-weight: 600; }
-
-  /* hero terminal card */
-  .term {
-    border: 1px solid var(--line-strong); border-radius: var(--r); overflow: hidden;
-    background: linear-gradient(180deg, var(--panel-2), var(--panel));
-    box-shadow: 0 40px 90px -40px rgba(0,0,0,.85), inset 0 1px 0 rgba(255,255,255,.04);
-    font-family: var(--mono); font-size: 13px;
-  }
-  .term-bar { display: flex; align-items: center; gap: 8px; padding: 11px 14px;
-    border-bottom: 1px solid var(--line); background: rgba(255,255,255,.015); }
-  .term-bar .tdot { width: 11px; height: 11px; border-radius: 50%; }
-  .term-bar .c1 { background: #ff5f57; } .term-bar .c2 { background: #febc2e; } .term-bar .c3 { background: #28c840; }
-  .term-bar .ttitle { margin-left: 8px; color: var(--ink-mute); font-size: 12px; }
-  .term-body { padding: 16px 16px 18px; line-height: 1.85; min-height: 232px; }
-  .term-body .ln { white-space: pre-wrap; }
-  .term-body .p { color: var(--green); } .term-body .c { color: var(--cyan-soft); }
-  .term-body .m { color: var(--ink-mute); } .term-body .v { color: var(--violet-soft); }
-  .term-body .ok { color: var(--green); } .term-body .warn { color: var(--amber); }
-  .cursor { display: inline-block; width: 8px; height: 15px; vertical-align: -2px;
-    background: var(--cyan); animation: blink 1s step-end infinite; }
-  @keyframes blink { 50% { opacity: 0; } }
-
-  /* ---------- reveal ---------- */
-  .reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
-  .reveal.in { opacity: 1; transform: none; }
-  .reveal.d1 { transition-delay: .08s; } .reveal.d2 { transition-delay: .16s; }
-  .reveal.d3 { transition-delay: .24s; } .reveal.d4 { transition-delay: .32s; }
-
-  /* ---------- hook ---------- */
-  #hook { background:
-      radial-gradient(80% 120% at 50% -10%, rgba(167,139,250,.1), transparent 55%), var(--bg-2); }
-  .hook-card {
-    position: relative; border-radius: 22px; padding: clamp(28px, 4vw, 52px);
-    background: linear-gradient(135deg, rgba(167,139,250,.08), rgba(34,211,238,.05));
-    border: 1px solid var(--line-strong); overflow: hidden;
-    box-shadow: 0 40px 100px -50px rgba(0,0,0,.9);
-  }
-  .hook-card::before {
-    content: ""; position: absolute; inset: -1px; border-radius: 22px; padding: 1px;
-    background: linear-gradient(120deg, var(--violet), transparent 35%, transparent 65%, var(--cyan));
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor; mask-composite: exclude; opacity: .5; pointer-events: none;
-  }
-  .hook-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px; align-items: center; position: relative; }
-  @media (max-width: 860px){ .hook-grid { grid-template-columns: 1fr; gap: 28px; } }
-  .hook-title { font-size: clamp(26px, 3.6vw, 40px); margin-top: 18px; }
-  .hook-body { color: var(--ink-soft); margin-top: 16px; }
-  .hook-body strong { color: var(--ink); font-weight: 600; }
-  .framing {
-    margin-top: 26px; padding: 20px 22px; border-left: 3px solid var(--violet);
-    background: rgba(167,139,250,.06); border-radius: 0 12px 12px 0;
-    font-size: clamp(16px, 1.7vw, 19px); color: var(--ink); font-weight: 500;
-  }
-  .hook-aside { display: grid; gap: 14px; }
-  .stat { border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; background: rgba(255,255,255,.02); }
-  .stat .big { font-size: 30px; font-weight: 800; letter-spacing: -.02em; }
-  .stat .big.cyan { color: var(--cyan); } .stat .big.violet { color: var(--violet); } .stat .big.green { color: var(--green); }
-  .stat .lab { font-family: var(--mono); font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-mute); margin-top: 4px; }
-  .disclosed { font-family: var(--mono); font-size: 12px; color: var(--green); display: inline-flex; gap: 7px; align-items: center; margin-bottom: 4px; }
-  .disclosed::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 9px var(--green); }
-
-  /* ---------- pipeline ---------- */
-  .sec-head { max-width: 760px; margin-bottom: 52px; }
-  .sec-head h2 { font-size: clamp(28px, 4vw, 46px); margin: 18px 0 16px; }
-  .pipe { display: grid; gap: 18px; }
-  .stage {
-    position: relative; display: grid; grid-template-columns: 64px 1fr; gap: 22px; align-items: start;
-    padding: 22px 24px; border: 1px solid var(--line); border-radius: var(--r);
-    background: linear-gradient(180deg, var(--panel), var(--bg-2));
-    transition: border-color .5s, box-shadow .5s, transform .5s var(--ease);
-  }
-  .stage.lit { border-color: rgba(34,211,238,.4); box-shadow: 0 0 0 1px rgba(34,211,238,.18), 0 24px 60px -40px var(--glow-cyan); }
-  .stage .num {
-    width: 64px; height: 64px; border-radius: 14px; display: grid; place-items: center;
-    font-family: var(--mono); font-weight: 700; font-size: 20px; color: var(--ink-mute);
-    border: 1px solid var(--line-strong); background: rgba(255,255,255,.02);
-    position: relative; transition: color .5s, border-color .5s, background .5s;
-  }
-  .stage.lit .num { color: var(--cyan); border-color: rgba(34,211,238,.5); background: rgba(34,211,238,.08); }
-  .stage .ico { position: absolute; inset: 0; display: grid; place-items: center; opacity: .9; }
-  .stage h3 { font-size: 20px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .stage p { color: var(--ink-soft); margin-top: 8px; font-size: 15.5px; max-width: 70ch; }
-  .stage .tag {
-    font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
-    color: var(--violet-soft); border: 1px solid var(--line); border-radius: 6px; padding: 3px 8px;
-  }
-  .stage .note { font-family: var(--mono); font-size: 12.5px; color: var(--amber); margin-top: 10px; opacity: .9; }
-  .pipe-rail { position: absolute; left: 55px; top: 90px; bottom: -18px; width: 2px;
-    background: linear-gradient(var(--line-strong), transparent); }
-  @media (max-width: 620px){
-    .stage { grid-template-columns: 1fr; }
-    .stage .num { width: 52px; height: 52px; }
-  }
-
-  /* ---------- the loop ---------- */
-  #loop { background: radial-gradient(90% 120% at 50% 0%, rgba(34,211,238,.07), transparent 50%), var(--bg-2); }
-  .loop-stage {
-    margin-top: 12px; border: 1px solid var(--line-strong); border-radius: 22px; overflow: hidden;
-    background: linear-gradient(180deg, var(--panel-2), var(--panel));
-    box-shadow: 0 50px 120px -60px rgba(0,0,0,.9);
-  }
-  .loop-viz { padding: clamp(18px, 3vw, 34px); }
-  .loop-svg { width: 100%; height: auto; display: block; max-height: 360px; }
-  .loop-cap { font-family: var(--mono); font-size: 12.5px; }
-  .node-label { font-family: var(--sans); font-weight: 700; }
-  .domains { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 clamp(18px,3vw,34px) 4px; }
-  .domains .dchip {
-    font-family: var(--mono); font-size: 11.5px; color: var(--ink-soft);
-    padding: 5px 10px; border: 1px solid var(--line); border-radius: 7px; background: rgba(255,255,255,.02);
-    transition: border-color .4s, color .4s, background .4s;
-  }
-  .domains .dchip.active { color: var(--cyan); border-color: rgba(34,211,238,.45); background: rgba(34,211,238,.07); }
-
-  .exchange {
-    border-top: 1px solid var(--line); padding: clamp(18px,3vw,28px) clamp(18px,3vw,34px);
-    display: grid; gap: 12px; min-height: 184px;
-  }
-  .msg {
-    display: grid; grid-template-columns: 118px 1fr; gap: 14px; align-items: baseline;
-    font-family: var(--mono); font-size: 13.5px; opacity: 0; transform: translateY(8px);
-    transition: opacity .45s var(--ease), transform .45s var(--ease);
-  }
-  .msg.show { opacity: 1; transform: none; }
-  .msg .who { font-weight: 700; text-align: right; font-size: 12.5px; letter-spacing: .02em; }
-  .msg.r .who { color: var(--cyan); } .msg.s .who { color: var(--violet); } .msg.g .who { color: var(--green); }
-  .msg .txt { color: var(--ink-soft); line-height: 1.55; }
-  .msg .txt code { color: var(--cyan-soft); background: rgba(34,211,238,.08); padding: 1px 5px; border-radius: 5px; }
-  .msg.g .txt { color: var(--green); }
-  @media (max-width: 560px){ .msg { grid-template-columns: 1fr; gap: 3px; } .msg .who { text-align: left; } }
-
-  .gate-legend { display: flex; flex-wrap: wrap; gap: 14px 26px; margin-top: 8px; }
-  .gate-legend .li { display: flex; gap: 9px; align-items: center; font-size: 14px; color: var(--ink-soft); }
-  .gate-legend .li b { color: var(--ink); }
-  .req { font-family: var(--mono); font-size: 11.5px; color: var(--green); }
-
-  /* loop animation keyframes */
-  .packet { offset-rotate: 0deg; }
-  .pkt-rs { animation: flowRS 5.5s linear infinite; }
-  .pkt-sr { animation: flowSR 5.5s linear infinite; animation-delay: 2.75s; }
-  @keyframes flowRS { 0%{ offset-distance: 0%; opacity: 0; } 6%{ opacity: 1; } 44%{ opacity: 1; } 50%,100%{ offset-distance: 100%; opacity: 0; } }
-  @keyframes flowSR { 0%{ offset-distance: 0%; opacity: 0; } 6%{ opacity: 1; } 44%{ opacity: 1; } 50%,100%{ offset-distance: 100%; opacity: 0; } }
-  .gate-ring { transform-origin: center; animation: gatePulse 5.5s ease-in-out infinite; }
-  @keyframes gatePulse { 0%,55%{ opacity:.3; r: 30; } 70%{ opacity:1; r: 38; } 85%,100%{ opacity:.3; r:30; } }
-  .node-pulse { transform-box: fill-box; transform-origin: center; }
-  .pulse-r { animation: nodeR 5.5s ease-in-out infinite; }
-  .pulse-s { animation: nodeS 5.5s ease-in-out infinite; }
-  @keyframes nodeR { 0%,46%,100%{ filter: drop-shadow(0 0 0 transparent);} 12%{ filter: drop-shadow(0 0 14px var(--glow-cyan)); } }
-  @keyframes nodeS { 0%,46%,100%{ filter: drop-shadow(0 0 0 transparent);} 60%{ filter: drop-shadow(0 0 14px var(--glow-violet)); } }
-  .dash { stroke-dasharray: 6 8; animation: dashMove 1.6s linear infinite; }
-  @keyframes dashMove { to { stroke-dashoffset: -28; } }
-
-  /* ---------- universality ---------- */
-  .uni-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
-  @media (max-width: 820px){ .uni-grid { grid-template-columns: 1fr; } }
-  .card {
-    border: 1px solid var(--line); border-radius: var(--r); padding: 26px 26px 28px;
-    background: linear-gradient(180deg, var(--panel), var(--bg-2)); position: relative; overflow: hidden;
-  }
-  .card h3 { font-size: 21px; display: flex; align-items: center; gap: 11px; }
-  .card p { color: var(--ink-soft); margin-top: 12px; font-size: 15.5px; }
-  .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
-  .chip {
-    font-family: var(--mono); font-size: 13px; padding: 8px 14px; border-radius: 9px;
-    border: 1px solid var(--line-strong); background: rgba(255,255,255,.02); color: var(--ink);
-    display: inline-flex; gap: 8px; align-items: center; transition: transform .2s, border-color .2s, background .2s;
-  }
-  .chip:hover { transform: translateY(-2px); border-color: var(--cyan); background: rgba(34,211,238,.06); }
-  .chip .blip { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 8px var(--glow-cyan); }
-  .chip.any { border-style: dashed; color: var(--ink-soft); }
-  .chip.any .blip { background: var(--violet); box-shadow: 0 0 8px var(--glow-violet); }
-  .layers { display: grid; gap: 10px; margin-top: 18px; }
-  .layer { display: flex; gap: 12px; align-items: center; font-size: 14.5px; color: var(--ink-soft);
-    padding: 11px 14px; border: 1px solid var(--line); border-radius: 11px; background: rgba(255,255,255,.015); }
-  .layer .k { font-family: var(--mono); font-size: 12px; color: var(--violet-soft); }
-  .layer b { color: var(--ink); font-weight: 600; }
-  .tieback { margin-top: 16px; font-size: 14px; color: var(--ink-mute); font-style: italic; }
-
-  /* ---------- architecture ---------- */
-  #arch { background: var(--bg-2); }
-  .mermaid-wrap {
-    border: 1px solid var(--line-strong); border-radius: var(--r); padding: clamp(16px, 3vw, 36px);
-    background: linear-gradient(180deg, var(--panel), var(--bg)); overflow-x: auto;
-    box-shadow: 0 40px 100px -60px rgba(0,0,0,.9);
-  }
-  .mermaid { display: flex; justify-content: center; min-width: 520px; }
-  .arch-fallback { display: none; font-family: var(--mono); font-size: 13px; color: var(--ink-soft);
-    white-space: pre; line-height: 1.7; overflow-x: auto; }
-  .arch-fallback.show { display: block; }
-
-  /* ---------- ethics footer ---------- */
-  #ethics { background: var(--bg); border-top: 1px solid var(--line); }
-  .ethics-card {
-    border: 1px solid var(--line-strong); border-radius: 20px; padding: clamp(26px, 4vw, 44px);
-    background: linear-gradient(135deg, rgba(52,211,153,.05), rgba(34,211,238,.03));
+  /* generic schematic panel */
+  .panel {
+    border: 1px solid var(--rule); border-radius: 12px; background: rgba(15,24,36,.55);
     position: relative;
   }
-  .ethics-card h2 { font-size: clamp(22px, 3vw, 32px); display: flex; align-items: center; gap: 12px; }
-  .ethics-card p { color: var(--ink-soft); margin-top: 16px; max-width: 78ch; font-size: 16px; }
-  .ethics-card .pts { display: grid; gap: 10px; margin-top: 20px; }
-  .ethics-card .pt { display: flex; gap: 12px; align-items: flex-start; color: var(--ink-soft); font-size: 15px; }
-  .ethics-card .pt svg { flex: none; margin-top: 3px; }
-  .foot {
-    display: flex; flex-wrap: wrap; gap: 18px; align-items: center; justify-content: space-between;
-    margin-top: 38px; padding-top: 26px; border-top: 1px solid var(--line);
+  .panel::after {
+    /* corner ticks like a drawing frame */
+    content: ""; position: absolute; inset: 7px; border: 1px dashed var(--rule-soft);
+    border-radius: 7px; pointer-events: none;
   }
-  .foot .sm { font-size: 13.5px; color: var(--ink-mute); }
-  .foot .links { display: flex; gap: 18px; align-items: center; }
-  .foot a { color: var(--ink-soft); text-decoration: none; font-size: 14.5px; transition: color .2s; }
-  .foot a:hover { color: var(--cyan); }
 
-  /* shared icon stroke */
+  /* ============================================================
+     1 · PIPELINE SCHEMATIC
+     ============================================================ */
+  .pipe-board { margin-top: 22px; padding: clamp(14px, 2.4vw, 26px); }
+  .pipe-board::after { display: none; }
+  .pipe-flow {
+    display: grid; gap: 10px;
+    grid-template-columns: repeat(4, 1fr);
+  }
+  @media (max-width: 1080px){ .pipe-flow { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px){ .pipe-flow { grid-template-columns: 1fr; } }
+
+  .node {
+    position: relative; text-align: left; cursor: pointer; color: inherit;
+    font: inherit; appearance: none; -webkit-appearance: none;
+    border: 1px solid var(--rule); border-radius: 10px; background: linear-gradient(180deg, var(--panel-2), var(--panel));
+    padding: 14px 14px 13px; display: grid; gap: 6px; min-height: 116px;
+    transition: border-color .25s, box-shadow .25s, transform .2s var(--ease), background .25s;
+  }
+  .node:hover, .node:focus-visible { border-color: var(--blue-dim); transform: translateY(-2px); }
+  .node[aria-expanded="true"] {
+    border-color: var(--phos-dim);
+    box-shadow: 0 0 0 1px rgba(111,227,168,.3), 0 14px 36px -22px rgba(111,227,168,.5);
+    background: linear-gradient(180deg, rgba(111,227,168,.07), var(--panel));
+  }
+  .node .port {
+    position: absolute; top: 50%; width: 9px; height: 9px; border-radius: 50%;
+    background: var(--paper); border: 1px solid var(--blue-dim); transform: translateY(-50%);
+  }
+  .node .port.in  { left: -5px; }
+  .node .port.out { right: -5px; }
+  .node[aria-expanded="true"] .port { border-color: var(--phos-dim); background: var(--phos); }
+  .node .nrow { display: flex; align-items: center; gap: 9px; }
+  .node .nidx { font-family: var(--mono); font-size: 11px; color: var(--ink-mute); letter-spacing: .08em; }
+  .node .icon { color: var(--blue); flex: none; }
+  .node[aria-expanded="true"] .icon { color: var(--phos); }
+  .node .ntitle { font-size: 14.5px; font-weight: 600; line-height: 1.25; }
+  .node .nkind { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--amber); }
+  .node .chev {
+    position: absolute; right: 12px; bottom: 11px; color: var(--ink-mute);
+    transition: transform .25s var(--ease), color .25s;
+  }
+  .node[aria-expanded="true"] .chev { transform: rotate(180deg); color: var(--phos); }
+
+  /* wires drawn between rows on wide layout */
+  .wire-row { position: relative; height: 0; }
+  .wire-arrow {
+    font-family: var(--mono); color: var(--wire); font-size: 13px;
+  }
+
+  /* inline expansion panel for a node */
+  .node-detail {
+    grid-column: 1 / -1; margin: 2px 0 8px;
+    border: 1px solid var(--phos-dim); border-radius: 10px; overflow: hidden;
+    background: linear-gradient(180deg, rgba(111,227,168,.05), rgba(15,24,36,.6));
+  }
+  .node-detail .hd {
+    display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+    border-bottom: 1px solid var(--rule); font-family: var(--mono); font-size: 12.5px; color: var(--phos);
+    letter-spacing: .04em;
+  }
+  .node-detail .hd .x {
+    margin-left: auto; cursor: pointer; background: none; border: 1px solid var(--rule);
+    color: var(--ink-soft); border-radius: 6px; width: 26px; height: 26px; font: inherit; line-height: 1;
+    display: grid; place-items: center;
+  }
+  .node-detail .hd .x:hover { border-color: var(--rust-dim); color: var(--rust); }
+  .nd-io { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: var(--rule-soft); }
+  @media (max-width: 720px){ .nd-io { grid-template-columns: 1fr; } }
+  .nd-io .cell { background: var(--paper-2); padding: 13px 16px; }
+  .nd-io .cell .lab {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--ink-mute); margin-bottom: 7px; display: flex; align-items: center; gap: 7px;
+  }
+  .nd-io .cell.in   .lab { color: var(--blue); }
+  .nd-io .cell.out  .lab { color: var(--phos); }
+  .nd-io .cell .v { font-size: 13.5px; color: var(--ink-soft); }
+  .nd-io .cell code, .mono-inline {
+    font-family: var(--mono); font-size: 12.5px; color: var(--amber);
+    background: rgba(242,182,92,.08); padding: 1px 5px; border-radius: 4px; word-break: break-word;
+  }
+  .nd-body { padding: 14px 16px 16px; }
+  .nd-body p { color: var(--ink-soft); font-size: 14px; }
+  .nd-body .flag {
+    margin-top: 10px; font-family: var(--mono); font-size: 12px; color: var(--amber);
+  }
+  .nd-body .flag.ok { color: var(--phos); }
+
+  /* ============================================================
+     2 · THE LOOP (step-through)
+     ============================================================ */
+  .loop-board { margin-top: 22px; display: grid; grid-template-columns: 1fr; gap: 0; }
+  .loop-board::after { display: none; }
+  .loop-top {
+    display: grid; grid-template-columns: 1.05fr .95fr; gap: 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  @media (max-width: 880px){ .loop-top { grid-template-columns: 1fr; } }
+  .loop-diagram { padding: clamp(14px, 2.2vw, 22px); border-right: 1px solid var(--rule); }
+  @media (max-width: 880px){ .loop-diagram { border-right: none; border-bottom: 1px solid var(--rule); } }
+  .loop-svg { width: 100%; height: auto; display: block; }
+  .ldim { fill: var(--ink-mute); }
+
+  .loop-stage-node { transition: opacity .3s; }
+  .loop-stage-node.dim { opacity: .28; }
+  .loop-wire { transition: stroke .3s, opacity .3s; }
+  .loop-wire.dim { opacity: .14; }
+  .loop-wire.hot { stroke: var(--phos); opacity: 1; }
+
+  .loop-ctrls {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: 14px clamp(14px,2.2vw,22px); border-top: 1px solid var(--rule); grid-column: 1 / -1;
+  }
+  .btn {
+    font: inherit; font-family: var(--mono); font-size: 12.5px; cursor: pointer;
+    border: 1px solid var(--rule); background: rgba(94,169,214,.06); color: var(--ink);
+    border-radius: 7px; padding: 8px 14px; display: inline-flex; align-items: center; gap: 8px;
+    transition: border-color .2s, background .2s, color .2s, transform .12s;
+  }
+  .btn:hover:not(:disabled) { border-color: var(--blue-dim); background: rgba(94,169,214,.12); }
+  .btn:active:not(:disabled) { transform: translateY(1px); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn.primary { border-color: var(--phos-dim); background: rgba(111,227,168,.1); color: var(--phos); }
+  .btn.primary:hover:not(:disabled) { background: rgba(111,227,168,.18); }
+  .loop-progress { font-family: var(--mono); font-size: 12px; color: var(--ink-mute); margin-left: auto; }
+  .loop-progress b { color: var(--blue); }
+
+  .loop-feed {
+    padding: clamp(14px, 2.2vw, 22px); display: flex; flex-direction: column; gap: 10px;
+    min-height: 280px;
+  }
+  .loop-domain {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-mute);
+  }
+  .loop-domain b { color: var(--amber); }
+  .turn {
+    display: grid; grid-template-columns: 96px 1fr; gap: 12px; align-items: start;
+    font-size: 13.5px; opacity: 0; transform: translateY(6px);
+    transition: opacity .35s var(--ease), transform .35s var(--ease);
+  }
+  .turn.show { opacity: 1; transform: none; }
+  .turn .who {
+    font-family: var(--mono); font-size: 11.5px; font-weight: 600; text-align: right; padding-top: 1px;
+    letter-spacing: .02em;
+  }
+  .turn.r  .who { color: var(--blue); }
+  .turn.s  .who { color: var(--amber); }
+  .turn.g  .who { color: var(--phos); }
+  .turn.x  .who { color: var(--rust); }
+  .turn .txt { color: var(--ink-soft); line-height: 1.5; }
+  .turn .txt code {
+    font-family: var(--mono); font-size: 12.5px; color: var(--amber);
+    background: rgba(242,182,92,.08); padding: 1px 5px; border-radius: 4px;
+  }
+  .turn.g .txt, .turn.g .txt code { color: var(--phos); background: rgba(111,227,168,.08); }
+  @media (max-width: 520px){ .turn { grid-template-columns: 1fr; gap: 2px; } .turn .who { text-align: left; } }
+
+  .domain-rail { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 20px; }
+  .domain-rail .dc {
+    font-family: var(--mono); font-size: 11px; color: var(--ink-mute);
+    border: 1px solid var(--rule); border-radius: 6px; padding: 5px 9px; background: rgba(94,169,214,.03);
+  }
+  .domain-rail .dc.on { color: var(--phos); border-color: var(--phos-dim); background: rgba(111,227,168,.07); }
+
+  /* ============================================================
+     3 · CONSENSUS GATE (interactive logic)
+     ============================================================ */
+  .gate-board { margin-top: 22px; display: grid; grid-template-columns: 1.1fr .9fr; gap: 0; }
+  .gate-board::after { display: none; }
+  @media (max-width: 880px){ .gate-board { grid-template-columns: 1fr; } }
+  .gate-reqs { padding: clamp(14px,2.2vw,22px); border-right: 1px solid var(--rule); }
+  @media (max-width: 880px){ .gate-reqs { border-right: none; border-bottom: 1px solid var(--rule); } }
+  .gate-reqs .hint { font-family: var(--mono); font-size: 11.5px; color: var(--ink-mute); margin-bottom: 14px; }
+  .req {
+    display: flex; gap: 12px; align-items: flex-start; padding: 11px 12px; border-radius: 9px;
+    border: 1px solid var(--rule); margin-bottom: 9px; cursor: pointer; position: relative;
+    transition: border-color .2s, background .2s;
+  }
+  .req:hover { border-color: var(--blue-dim); }
+  .req input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .req .box {
+    flex: none; width: 20px; height: 20px; border-radius: 5px; border: 1px solid var(--rule-soft);
+    display: grid; place-items: center; margin-top: 1px; background: var(--paper-2);
+    transition: border-color .2s, background .2s;
+  }
+  .req .box svg { opacity: 0; transition: opacity .15s; color: var(--paper); }
+  .req input:checked + .box { background: var(--phos); border-color: var(--phos); }
+  .req input:checked + .box svg { opacity: 1; }
+  .req input:focus-visible + .box { outline: 2px solid var(--phos); outline-offset: 2px; }
+  .req:has(input:checked) { border-color: var(--phos-dim); background: rgba(111,227,168,.05); }
+  .req .meta .name { font-size: 14px; font-weight: 600; }
+  .req .meta .ex { font-family: var(--mono); font-size: 11.5px; color: var(--ink-mute); margin-top: 3px; line-height: 1.45; }
+  .req .meta .ex code { color: var(--amber); }
+  .req .key { margin-left: auto; font-family: var(--mono); font-size: 10px; color: var(--ink-mute); white-space: nowrap; }
+
+  .gate-viz { padding: clamp(14px,2.2vw,22px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+  .gate-svg { width: 100%; max-width: 280px; height: auto; }
+  .gate-readout {
+    width: 100%; border: 1px solid var(--rule); border-radius: 9px; padding: 13px 15px;
+    font-family: var(--mono); font-size: 12.5px; transition: border-color .3s, background .3s;
+  }
+  .gate-readout .state { font-weight: 700; font-size: 13.5px; letter-spacing: .06em; display: flex; align-items: center; gap: 9px; }
+  .gate-readout .detail { color: var(--ink-soft); margin-top: 8px; line-height: 1.5; font-size: 12px; }
+  .gate-readout .detail .miss { color: var(--rust); }
+  .gate-readout.open  { border-color: var(--phos-dim); background: rgba(111,227,168,.06); }
+  .gate-readout.open  .state { color: var(--phos); }
+  .gate-readout.shut  { border-color: var(--rust-dim); background: rgba(224,121,95,.05); }
+  .gate-readout.shut  .state { color: var(--rust); }
+  .gate-count { font-family: var(--mono); font-size: 11px; color: var(--ink-mute); }
+  .gate-count b { color: var(--blue); }
+
+  /* gate door animation parts */
+  #gate-door-l, #gate-door-r { transition: transform .5s var(--ease); transform-origin: center; }
+  .gate-shut #gate-door-l { transform: translateX(0); }
+  .gate-shut #gate-door-r { transform: translateX(0); }
+  .gate-open #gate-door-l { transform: translateX(-26px); }
+  .gate-open #gate-door-r { transform: translateX(26px); }
+  #gate-beam { transition: opacity .4s; }
+  .gate-shut #gate-beam { opacity: 0; }
+  .gate-open #gate-beam { opacity: 1; }
+
+  /* ============================================================
+     4 · VALIDATOR LADDER
+     ============================================================ */
+  .ladder { margin-top: 22px; display: grid; gap: 0; }
+  .ladder::after { display: none; }
+  .rung {
+    display: grid; grid-template-columns: 56px 1fr auto; gap: 16px; align-items: center;
+    padding: 16px clamp(14px,2.2vw,22px); border-bottom: 1px solid var(--rule); position: relative;
+  }
+  .rung:last-child { border-bottom: none; }
+  .rung .step {
+    width: 40px; height: 40px; border-radius: 9px; display: grid; place-items: center;
+    font-family: var(--mono); font-weight: 600; font-size: 14px; color: var(--blue);
+    border: 1px solid var(--blue-dim); background: rgba(94,169,214,.06);
+  }
+  .rung.econ .step { color: var(--amber); border-color: var(--amber-dim); background: rgba(242,182,92,.06); }
+  .rung .body .name { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+  .rung .body .name .tool { font-family: var(--mono); font-size: 11px; color: var(--ink-mute); border: 1px solid var(--rule); border-radius: 5px; padding: 2px 7px; }
+  .rung .body p { color: var(--ink-soft); font-size: 13.5px; margin-top: 5px; }
+  .rung .gate-marker {
+    font-family: var(--mono); font-size: 11px; color: var(--phos-dim); white-space: nowrap; text-align: right;
+  }
+  .rung .gate-marker b { color: var(--phos); display: block; font-size: 12px; }
+  @media (max-width: 620px){
+    .rung { grid-template-columns: 44px 1fr; }
+    .rung .gate-marker { grid-column: 2; text-align: left; }
+  }
+  .ladder-foot {
+    padding: 14px clamp(14px,2.2vw,22px); border-top: 1px solid var(--rule);
+    display: flex; gap: 12px; align-items: flex-start; font-size: 13.5px; color: var(--ink-soft);
+    background: rgba(111,227,168,.03);
+  }
+  .ladder-foot svg { flex: none; color: var(--phos); margin-top: 2px; }
+  .ladder-foot b { color: var(--ink); }
+  .ladder-foot code { font-family: var(--mono); font-size: 12px; color: var(--phos); }
+
+  /* ============================================================
+     5 · REAL CASES → DOMAINS
+     ============================================================ */
+  .cases { margin-top: 22px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  @media (max-width: 920px){ .cases { grid-template-columns: 1fr; } }
+  .case { padding: 18px 18px 16px; display: grid; gap: 9px; align-content: start; }
+  .case .top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .case .nm { font-size: 16px; font-weight: 700; }
+  .case .loss { font-family: var(--mono); font-size: 13px; color: var(--rust); font-weight: 600; }
+  .case .when { font-family: var(--mono); font-size: 11px; color: var(--ink-mute); letter-spacing: .04em; }
+  .case p { color: var(--ink-soft); font-size: 13.5px; }
+  .case p code { font-family: var(--mono); font-size: 12px; color: var(--amber); }
+  .case .maps {
+    margin-top: 4px; font-family: var(--mono); font-size: 11px; color: var(--phos);
+    border-top: 1px dashed var(--rule); padding-top: 11px; display: flex; align-items: center; gap: 8px;
+  }
+  .case .maps .arrow { color: var(--ink-mute); }
+  .case.feature { grid-column: 1 / -1; border-color: var(--amber-dim); background: rgba(242,182,92,.04); }
+  .case.feature .maps { color: var(--amber); }
+
+  /* ---- architecture fallback diagram ---- */
+  .arch { margin-top: 22px; padding: clamp(14px,2.4vw,28px); overflow-x: auto; }
+  .arch::after { display: none; }
+  .mermaid { display: flex; justify-content: center; min-width: 540px; }
+  .arch-fallback {
+    display: none; font-family: var(--mono); font-size: 12.5px; color: var(--ink-soft);
+    white-space: pre; line-height: 1.65; overflow-x: auto;
+  }
+  .arch-fallback.show { display: block; }
+  .arch-cap { font-family: var(--mono); font-size: 11.5px; color: var(--ink-mute); margin-top: 12px; }
+
+  /* ---- footer ---- */
+  footer { border-top: 1px solid var(--rule); margin-top: 36px; padding: 26px 0 40px; }
+  .foot-grid { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; justify-content: space-between; }
+  .ethics {
+    font-family: var(--mono); font-size: 12px; color: var(--ink-mute); max-width: 70ch; line-height: 1.65;
+  }
+  .ethics b { color: var(--ink-soft); }
+  .ethics .dot { color: var(--phos-dim); }
+  .foot-links { display: flex; gap: 18px; align-items: center; font-family: var(--mono); font-size: 12.5px; }
+  .foot-links a { color: var(--ink-soft); text-decoration: none; transition: color .2s; }
+  .foot-links a:hover { color: var(--phos); }
+
   .ic { stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 
-  /* ---------- reduced motion ---------- */
+  /* ---- reduced motion: keep everything reachable, kill decorative motion ---- */
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    *, *::before, *::after { animation: none !important; transition: none !important; }
-    .reveal { opacity: 1 !important; transform: none !important; }
-    .msg { opacity: 1 !important; transform: none !important; }
-    .stage { border-color: rgba(34,211,238,.25); }
-    .cursor { display: none; }
-    .packet { opacity: 1 !important; }
-    .gate-ring { opacity: .9 !important; }
-    .dchip { /* all shown as plain */ }
+    *, *::before, *::after { transition-duration: .001ms !important; animation-duration: .001ms !important; animation-iteration-count: 1 !important; }
+    .turn { opacity: 1 !important; transform: none !important; }
   }
 </style>
 </head>
 <body>
 
-<!-- ====================== NAV ====================== -->
-<nav class="nav" id="nav" aria-label="Primary">
-  <a class="brand" href="#hero" aria-label="Autonomous Audit Agents — home">
-    <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
-      <defs>
-        <linearGradient id="g-mark" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#a78bfa"/>
-        </linearGradient>
-      </defs>
-      <path d="M16 2 L28 7 V16 C28 23 22 28 16 30 C10 28 4 23 4 16 V7 Z" fill="none" stroke="url(#g-mark)" stroke-width="2"/>
-      <path d="M11 16 l3.4 3.4 L21 12" fill="none" stroke="url(#g-mark)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <span>Audit&nbsp;Agents</span>
-  </a>
-  <div class="links">
-    <a href="#hook">Origin</a>
-    <a href="#pipeline">Pipeline</a>
-    <a href="#loop">The loop</a>
-    <a href="#universality">Universality</a>
-    <a class="repo" href="https://github.com/DefaultPerson/audit-agents-system" target="_blank" rel="noopener noreferrer">
-      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.33c-2.23.49-2.7-1.07-2.7-1.07-.36-.93-.89-1.18-.89-1.18-.73-.5.05-.49.05-.49.81.06 1.23.83 1.23.83.72 1.23 1.88.87 2.34.67.07-.52.28-.87.51-1.07-1.78-.2-3.65-.89-3.65-3.96 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.08-1.87 3.76-3.66 3.96.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
-      GitHub
-    </a>
-  </div>
-</nav>
-
-<!-- ====================== HERO ====================== -->
-<section id="hero" aria-labelledby="hero-title">
-  <canvas id="bg-canvas" aria-hidden="true"></canvas>
-  <div class="hero-veil" aria-hidden="true"></div>
+<!-- ================= MASTHEAD / TITLE-BLOCK ================= -->
+<header class="masthead">
   <div class="wrap">
-    <div class="hero-grid">
-      <div>
-        <span class="eyebrow reveal in"><span class="dot"></span> Concept demonstration · autonomous security research</span>
-        <h1 class="h1 reveal in d1" id="hero-title" style="margin-top:22px;">
-          Autonomous agents that <span class="grad-text">research vulnerabilities</span> in closed-source EVM contracts.
-        </h1>
-        <p class="hero-tag reveal in d2">
-          Two large models argue. A deterministic gate only lets evidence through. A pinned-fork validator decides what is real.
-          The method is domain-agnostic — and it has already found bugs humans missed.
-        </p>
-        <div class="hero-cta reveal in d3">
-          <a class="btn btn-primary" href="https://github.com/DefaultPerson/audit-agents-system" target="_blank" rel="noopener noreferrer">
-            View the repository
-            <svg width="17" height="17" viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
-          </a>
-          <a class="btn btn-ghost" href="#hook">How it works
-            <svg width="17" height="17" viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-          </a>
-        </div>
-        <div class="hero-meta reveal in d4">
-          <span class="pill">EVM adapters: <b>Eth · BSC · Base · Polygon · Arbitrum</b></span>
-          <span class="pill">Researcher <b>⇄</b> Skeptic</span>
-          <span class="pill">Evidence-gated consensus</span>
-        </div>
+    <div class="titleblock">
+      <div class="mark">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <rect x="3.5" y="3.5" width="25" height="25" rx="4" fill="none" stroke="#5ea9d6" stroke-width="1.6"/>
+          <path d="M9 20 V12 M9 12 L16 16 L23 12 M23 12 V20" fill="none" stroke="#6fe3a8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="9" cy="12" r="1.7" fill="#6fe3a8"/><circle cx="23" cy="12" r="1.7" fill="#6fe3a8"/><circle cx="16" cy="16" r="1.7" fill="#f2b65c"/>
+        </svg>
+        <span class="nm">audit-agents-system<small>autonomous research pipeline</small></span>
       </div>
-
-      <div class="term reveal in d2" role="img" aria-label="Terminal showing an autoresearch run reaching consensus and validating a hypothesis on a pinned fork.">
-        <div class="term-bar">
-          <span class="tdot c1"></span><span class="tdot c2"></span><span class="tdot c3"></span>
-          <span class="ttitle">audit · autoresearch</span>
-        </div>
-        <div class="term-body" id="term"></div>
+      <div class="specs" aria-hidden="true">
+        <span>SCHEMA <b>evm-artifact-bundle/v1</b></span>
+        <span>TARGET <b>closed-source EVM bytecode</b></span>
+        <span>STATUS <b>conjecture · concept</b></span>
       </div>
+      <a class="repo-link" href="https://github.com/DefaultPerson/audit-agents-system" target="_blank" rel="noopener noreferrer">
+        <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.33c-2.23.49-2.7-1.07-2.7-1.07-.36-.93-.89-1.18-.89-1.18-.73-.5.05-.49.05-.49.81.06 1.23.83 1.23.83.72 1.23 1.88.87 2.34.67.07-.52.28-.87.51-1.07-1.78-.2-3.65-.89-3.65-3.96 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.08-1.87 3.76-3.66 3.96.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        repo
+      </a>
     </div>
   </div>
-</section>
+</header>
 
-<!-- ====================== HOOK ====================== -->
-<section id="hook" aria-labelledby="hook-title">
+<!-- ================= INTRO ANNOTATION ================= -->
+<div class="intro">
   <div class="wrap">
-    <div class="hook-card reveal">
-      <div class="hook-grid">
-        <div>
-          <span class="disclosed">Publicly disclosed · June 5, 2026</span>
-          <span class="eyebrow" style="display:block;width:max-content;margin-top:10px;"><span class="dot"></span> Why this matters</span>
-          <h2 class="hook-title" id="hook-title">A frontier model found a 4-year-old bug humans missed.</h2>
-          <p class="hook-body">
-            In late May 2026, Anthropic's <strong>Opus&nbsp;4.8</strong> — running an autonomous auditing agent on max effort —
-            independently discovered a <strong>critical soundness bug in Zcash's Orchard shielded pool</strong>:
-            a single missing copy-constraint in a halo2 ZK gadget that allowed <strong>undetectable in-pool counterfeiting</strong>.
-            It was responsibly disclosed and fixed via an emergency soft fork and the <strong>NU6.2 hard fork</strong>.
-            No exploitation was found.
-          </p>
-          <p class="framing">
-            If a frontier model can autonomously find a bug humans missed for four years in heavily-audited cryptography —
-            the same autonomous-research method applies to the millions of unaudited, closed-source contracts on EVM chains.
-          </p>
-        </div>
-        <div class="hook-aside" aria-hidden="false">
-          <div class="stat"><div class="big violet">4 yrs</div><div class="lab">Undetected in audited code</div></div>
-          <div class="stat"><div class="big cyan">1</div><div class="lab">Missing copy-constraint, halo2 gadget</div></div>
-          <div class="stat"><div class="big green">0</div><div class="lab">Known exploitations · fixed pre-disclosure</div></div>
-        </div>
-      </div>
-    </div>
-    <p class="lead reveal d2" style="margin-top:26px;">
-      This repository is a <strong style="color:var(--ink)">concept demonstration of that method</strong> — applied to EVM smart contracts.
-      It is not a weapon, and it ships without targets or credentials.
+    <p class="kicker">// an open question — and one conjecture about the answer</p>
+    <h1>How are so many bugs being found and drained <span class="hi">this fast</span>?</h1>
+    <p class="sub">
+      Crypto theft has surged — <span class="mono" style="color:var(--rust)">~$3.4B in 2025</span>, with Truebit, Balancer
+      and Solv each draining tens to hundreds of millions in the last few months. The targets keep looking the same:
+      old, closed-source, never-audited contracts. So how does anyone find these bugs at scale, before the defenders do?
+      This page lays out <b style="color:var(--ink)">one plausible method</b> — automated, AI-driven vulnerability research —
+      as an interactive schematic. The diagrams are live: click a stage, step the loop, flip the gate.
+    </p>
+    <p class="note">
+      <b>[Speculation]</b> This is a concept demonstration of <b>how it could be done</b>, not an accusation of any specific
+      attacker and not a product. That the capability is real is no longer hypothetical: in May 2026 Anthropic's
+      <b>Opus 4.8</b>, driving an autonomous auditing agent, found a 4-year-old soundness bug in Zcash's Orchard shielded
+      pool. Point the same method at the millions of unaudited, closed-source contracts on EVM chains and the question
+      above starts to answer itself.
     </p>
   </div>
-</section>
+</div>
 
-<!-- ====================== PIPELINE ====================== -->
-<section id="pipeline" aria-labelledby="pipe-title">
+<!-- ================= 1 · PIPELINE ================= -->
+<section id="pipeline" aria-labelledby="pipeline-h">
   <div class="wrap">
-    <div class="sec-head reveal">
-      <span class="eyebrow"><span class="dot"></span> The method</span>
-      <h2 id="pipe-title">Five stages, from raw bytecode to a validated finding.</h2>
-      <p class="lead">Every stage feeds the next an immutable artifact. Nothing reaches a report without evidence behind it.</p>
-    </div>
+    <p class="sec-tag"><span class="ord">1</span> the pipeline</p>
+    <div class="sec-h"><h2 id="pipeline-h">From raw bytecode to a validated finding</h2></div>
+    <p class="sec-lead">Each stage hands the next an immutable artifact. Click a node to open its mechanics — what goes <span style="color:var(--blue)">in</span>, what it transforms, what comes <span style="color:var(--phos)">out</span>.</p>
 
-    <div class="pipe" id="pipe">
-      <div class="pipe-rail" aria-hidden="true"></div>
-
-      <article class="stage reveal" data-stage>
-        <div class="num"><span>01</span>
-          <span class="ico" style="opacity:0"><svg width="26" height="26" viewBox="0 0 24 24" class="ic"><path d="M3 7l9-4 9 4-9 4-9-4Z"/><path d="M3 12l9 4 9-4M3 17l9 4 9-4"/></svg></span>
-        </div>
-        <div>
-          <h3>Chain snapshot <span class="tag">discovery + triage</span></h3>
-          <p>Snapshot a chain at a pinned block, then triage for the targets worth researching: closed-source, high-value, old contracts — filtered by balance, proxy pattern, and verification status.</p>
-        </div>
-      </article>
-
-      <article class="stage reveal" data-stage>
-        <div class="num"><span>02</span></div>
-        <div>
-          <h3>Decompile bytecode <span class="tag">Dedaub + fallback</span></h3>
-          <p>Decompile via Dedaub, with a bytecode / disassembly / storage-layout fallback layer for the cases it can't recover.</p>
-          <p class="note">// Decompiled names are hints, not facts.</p>
-        </div>
-      </article>
-
-      <article class="stage reveal" data-stage>
-        <div class="num"><span>03</span></div>
-        <div>
-          <h3>Immutable artifact bundle <span class="tag">evidence base</span></h3>
-          <p>Build a frozen bundle of ground truth: selectors, storage layout, recent traces and balances. Every later hypothesis must point back to something in here.</p>
-        </div>
-      </article>
-
-      <article class="stage reveal" data-stage>
-        <div class="num"><span>04</span></div>
-        <div>
-          <h3>Autoresearch loop <span class="tag">Researcher ⇄ Skeptic</span></h3>
-          <p>Two different LLMs argue across specialist domains. A deterministic consensus gate passes a hypothesis only when it carries real evidence — selector, preconditions, impact, validation method, supporting fact.</p>
-        </div>
-      </article>
-
-      <article class="stage reveal" data-stage>
-        <div class="num"><span>05</span></div>
-        <div>
-          <h3>Validators <span class="tag">evidence-gated</span></h3>
-          <p>Foundry pinned-fork test → ItyFuzz → symbolic (Mythril / Halmos) → economic checks. Only validated findings become an internal report.</p>
-          <p class="note" style="color:var(--green)">// Disclosure is manual — never auto-sent.</p>
-        </div>
-      </article>
+    <div class="panel pipe-board">
+      <div class="pipe-flow" id="pipe-flow" role="list" aria-label="Pipeline stages — activate a stage to expand its mechanics"></div>
     </div>
   </div>
 </section>
 
-<!-- ====================== THE LOOP ====================== -->
-<section id="loop" aria-labelledby="loop-title">
+<!-- ================= 2 · THE LOOP ================= -->
+<section id="loop" aria-labelledby="loop-h">
   <div class="wrap">
-    <div class="sec-head reveal">
-      <span class="eyebrow"><span class="dot"></span> The star of the show</span>
-      <h2 id="loop-title">The debate: <span class="grad-text">Researcher ⇄ Skeptic</span>, behind a consensus gate.</h2>
-      <p class="lead">One model proposes attacks. A model from a different family attacks the proposal. Only evidence opens the gate.</p>
+    <p class="sec-tag"><span class="ord">2</span> the autoresearch loop</p>
+    <div class="sec-h"><h2 id="loop-h">Researcher ⇄ Skeptic, one turn at a time</h2></div>
+    <p class="sec-lead">
+      Two models from different families argue across six specialist domains. Step through a worked example on
+      <b style="color:var(--ink)">Truebit</b>-class bytecode — the Researcher proposes, the Skeptic demands proof, until the gate has what it needs.
+    </p>
+
+    <div class="panel loop-board">
+      <div class="loop-top">
+        <div class="loop-diagram">
+          <svg class="loop-svg" viewBox="0 0 460 240" role="img" aria-label="Researcher node on the left and Skeptic node on the right exchange messages; accepted hypotheses pass through a consensus gate to the validators.">
+            <defs>
+              <marker id="wa" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" fill="rgba(110,160,190,.6)"/>
+              </marker>
+            </defs>
+
+            <!-- exchange wires -->
+            <path class="loop-wire" id="w-rs" d="M120 92 C 190 56, 270 56, 340 92" fill="none" stroke="var(--blue)" stroke-width="1.8" marker-end="url(#wa)"/>
+            <path class="loop-wire" id="w-sr" d="M340 148 C 270 184, 190 184, 120 148" fill="none" stroke="var(--amber)" stroke-width="1.8" marker-end="url(#wa)"/>
+            <text x="230" y="50" text-anchor="middle" class="ldim mono" style="font-size:9px;">proposes hypothesis</text>
+            <text x="230" y="200" text-anchor="middle" class="ldim mono" style="font-size:9px;">challenges / demands proof</text>
+
+            <!-- researcher -->
+            <g class="loop-stage-node" id="n-researcher" transform="translate(70,120)">
+              <rect x="-52" y="-34" width="104" height="68" rx="9" fill="rgba(94,169,214,.07)" stroke="var(--blue)" stroke-width="1.6"/>
+              <circle cx="-52" cy="0" r="4" fill="var(--paper)" stroke="var(--blue)"/>
+              <circle cx="52" cy="0" r="4" fill="var(--paper)" stroke="var(--blue)"/>
+              <text text-anchor="middle" y="-6" fill="#5ea9d6" class="mono" style="font-size:12px;font-weight:600;">Researcher</text>
+              <text text-anchor="middle" y="12" fill="#9db4c4" class="mono" style="font-size:8.5px;">proposes attacks</text>
+            </g>
+
+            <!-- skeptic -->
+            <g class="loop-stage-node" id="n-skeptic" transform="translate(390,120)">
+              <rect x="-52" y="-34" width="104" height="68" rx="9" fill="rgba(242,182,92,.06)" stroke="var(--amber)" stroke-width="1.6"/>
+              <circle cx="-52" cy="0" r="4" fill="var(--paper)" stroke="var(--amber)"/>
+              <circle cx="52" cy="0" r="4" fill="var(--paper)" stroke="var(--amber)"/>
+              <text text-anchor="middle" y="-6" fill="#f2b65c" class="mono" style="font-size:12px;font-weight:600;">Skeptic</text>
+              <text text-anchor="middle" y="12" fill="#9db4c4" class="mono" style="font-size:8.5px;">breaks the case</text>
+            </g>
+
+            <!-- gate + validator -->
+            <g class="loop-stage-node" id="n-gate" transform="translate(230,120)">
+              <polygon points="0,-22 22,0 0,22 -22,0" fill="rgba(111,227,168,.06)" stroke="var(--phos-dim)" stroke-width="1.5"/>
+              <text text-anchor="middle" y="-1" fill="#6fe3a8" class="mono" style="font-size:7.5px;">GATE</text>
+              <text text-anchor="middle" y="9" fill="#6fe3a8" class="mono" style="font-size:6px;">5 facts</text>
+            </g>
+            <path class="loop-wire" id="w-gv" d="M230 144 V 196" fill="none" stroke="var(--phos-dim)" stroke-width="1.6" stroke-dasharray="3 5" marker-end="url(#wa)"/>
+            <text x="230" y="214" text-anchor="middle" fill="#6fe3a8" class="mono" style="font-size:8.5px;">→ validators</text>
+          </svg>
+        </div>
+
+        <div class="loop-feed">
+          <div class="loop-domain" id="loop-domain">domain · <b>—</b></div>
+          <div id="loop-turns" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <div class="loop-ctrls">
+        <button class="btn primary" id="loop-next" type="button">
+          <svg width="13" height="13" viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M5 4l10 8-10 8zM19 4v16"/></svg>
+          Next turn
+        </button>
+        <button class="btn" id="loop-reset" type="button">
+          <svg width="13" height="13" viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v4h4"/></svg>
+          Reset
+        </button>
+        <span class="loop-progress" id="loop-progress">turn <b>0</b> / 6</span>
+      </div>
     </div>
 
-    <div class="loop-stage reveal">
-      <div class="loop-viz">
-        <svg class="loop-svg" viewBox="0 0 900 340" role="img" aria-label="Researcher and Skeptic nodes exchange messages; verified hypotheses pass through a consensus gate to the pinned-fork validator.">
-          <defs>
-            <linearGradient id="gr-cyan" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#67e8f9"/><stop offset="1" stop-color="#22d3ee"/>
-            </linearGradient>
-            <linearGradient id="gr-violet" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#c4b5fd"/><stop offset="1" stop-color="#a78bfa"/>
-            </linearGradient>
-            <linearGradient id="gr-green" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#6ee7b7"/><stop offset="1" stop-color="#34d399"/>
-            </linearGradient>
-            <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-              <path d="M0 0 L10 5 L0 10 z" fill="rgba(140,170,210,.55)"/>
-            </marker>
-          </defs>
+    <div class="domain-rail" id="domain-rail" aria-label="The six specialist domains the loop iterates across"></div>
+  </div>
+</section>
 
-          <!-- exchange arcs between researcher and skeptic -->
-          <path id="arc-rs" d="M 235 118 C 360 60, 540 60, 665 118" fill="none" stroke="rgba(34,211,238,.35)" stroke-width="2" marker-end="url(#arrow)"/>
-          <path id="arc-sr" d="M 665 222 C 540 280, 360 280, 235 222" fill="none" stroke="rgba(167,139,250,.35)" stroke-width="2" marker-end="url(#arrow)"/>
+<!-- ================= 3 · CONSENSUS GATE ================= -->
+<section id="gate" aria-labelledby="gate-h">
+  <div class="wrap">
+    <p class="sec-tag"><span class="ord">3</span> the consensus gate</p>
+    <div class="sec-h"><h2 id="gate-h">Evidence, not opinion — flip the requirements</h2></div>
+    <p class="sec-lead">
+      The gate is deterministic. A hypothesis is promoted to validation only when <b style="color:var(--ink)">all five</b> facts are
+      present; miss one and it bounces back to the loop with a recorded reason. Toggle each requirement and watch the gate.
+    </p>
 
-          <text x="450" y="48" text-anchor="middle" class="loop-cap" fill="#67e8f9" style="font-family:var(--mono);font-size:12px;">proposes hypothesis →</text>
-          <text x="450" y="304" text-anchor="middle" class="loop-cap" fill="#c4b5fd" style="font-family:var(--mono);font-size:12px;">← challenges preconditions</text>
+    <div class="panel gate-board">
+      <div class="gate-reqs">
+        <p class="hint">// src: passes_consensus_gate(hypothesis) — toggle to simulate</p>
+        <div id="gate-req-list"></div>
+      </div>
 
-          <!-- Researcher node -->
-          <g class="node-pulse pulse-r" transform="translate(150,170)">
-            <circle r="60" fill="rgba(34,211,238,.07)" stroke="url(#gr-cyan)" stroke-width="2"/>
-            <circle r="60" fill="none" stroke="rgba(34,211,238,.25)" stroke-width="1" class="dash"/>
-            <text y="-6" text-anchor="middle" class="node-label" fill="#67e8f9" style="font-size:17px;">Researcher</text>
-            <text y="16" text-anchor="middle" fill="#aab6cf" style="font-family:var(--mono);font-size:11px;">proposes attacks</text>
-          </g>
-
-          <!-- Skeptic node -->
-          <g class="node-pulse pulse-s" transform="translate(750,170)">
-            <circle r="60" fill="rgba(167,139,250,.07)" stroke="url(#gr-violet)" stroke-width="2"/>
-            <circle r="60" fill="none" stroke="rgba(167,139,250,.25)" stroke-width="1" class="dash" style="animation-direction:reverse"/>
-            <text y="-6" text-anchor="middle" class="node-label" fill="#c4b5fd" style="font-size:17px;">Skeptic</text>
-            <text y="16" text-anchor="middle" fill="#aab6cf" style="font-family:var(--mono);font-size:11px;">breaks the case</text>
-          </g>
-
-          <!-- traveling packets -->
-          <g class="packet pkt-rs" style="offset-path:path('M 235 118 C 360 60, 540 60, 665 118');">
-            <circle r="6" fill="url(#gr-cyan)"/>
-          </g>
-          <g class="packet pkt-sr" style="offset-path:path('M 665 222 C 540 280, 360 280, 235 222');">
-            <circle r="6" fill="url(#gr-violet)"/>
-          </g>
-
-          <!-- consensus gate -->
-          <g transform="translate(450,170)">
-            <circle class="gate-ring" r="30" fill="none" stroke="url(#gr-green)" stroke-width="2"/>
-            <polygon points="0,-26 26,0 0,26 -26,0" fill="rgba(52,211,153,.08)" stroke="url(#gr-green)" stroke-width="2"/>
-            <text y="-2" text-anchor="middle" fill="#6ee7b7" style="font-family:var(--mono);font-size:10.5px;">CONSENSUS</text>
-            <text y="12" text-anchor="middle" fill="#6ee7b7" style="font-family:var(--mono);font-size:10.5px;">GATE</text>
-          </g>
-
-          <!-- gate -> validator -->
-          <path d="M 484 170 H 600" fill="none" stroke="rgba(52,211,153,.45)" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="2 6"/>
+      <div class="gate-viz">
+        <svg class="gate-svg" id="gate-svg" viewBox="0 0 200 150" role="img" aria-hidden="true">
+          <rect x="2" y="2" width="196" height="146" rx="8" fill="none" stroke="var(--rule)"/>
+          <!-- incoming hypothesis -->
+          <circle cx="24" cy="75" r="8" fill="rgba(94,169,214,.15)" stroke="var(--blue)" stroke-width="1.4"/>
+          <text x="24" y="98" text-anchor="middle" fill="#5ea9d6" class="mono" style="font-size:7px;">hyp</text>
+          <line x1="34" y1="75" x2="74" y2="75" stroke="var(--rule)" stroke-width="1.4" stroke-dasharray="2 3"/>
+          <!-- gate doors -->
+          <rect id="gate-door-l" x="78" y="38" width="20" height="74" rx="3" fill="rgba(224,121,95,.12)" stroke="var(--rust-dim)" stroke-width="1.4"/>
+          <rect id="gate-door-r" x="102" y="38" width="20" height="74" rx="3" fill="rgba(224,121,95,.12)" stroke="var(--rust-dim)" stroke-width="1.4"/>
+          <!-- beam through gate when open -->
+          <line id="gate-beam" x1="74" y1="75" x2="178" y2="75" stroke="var(--phos)" stroke-width="2" stroke-dasharray="4 4"/>
+          <!-- to validators -->
+          <circle cx="178" cy="75" r="8" fill="rgba(111,227,168,.12)" stroke="var(--phos-dim)" stroke-width="1.4"/>
+          <text x="178" y="98" text-anchor="middle" fill="#6fe3a8" class="mono" style="font-size:7px;">valid.</text>
         </svg>
-      </div>
 
-      <!-- specialist domains -->
-      <div class="domains" id="domains" aria-label="Specialist research domains the loop iterates across">
-        <span class="dchip">auth / upgradeability</span>
-        <span class="dchip">proxy / storage / delegatecall</span>
-        <span class="dchip">accounting / share-math</span>
-        <span class="dchip">oracle / price / liquidity</span>
-        <span class="dchip">state-machine / lifecycle</span>
-        <span class="dchip">external-calls / reentrancy</span>
-      </div>
-
-      <!-- cycling exchange snippets -->
-      <div class="exchange" id="exchange" aria-live="polite">
-        <!-- filled by JS; static fallback below for no-JS / reduced-motion is the first set -->
-        <div class="msg r show"><span class="who">Researcher →</span><span class="txt">selector <code>0x3659cfe6</code> looks like an unguarded upgrade path on the proxy.</span></div>
-        <div class="msg s show"><span class="who">Skeptic →</span><span class="txt">Show the missing access-control check and a storage fact that proves the slot is writable.</span></div>
-        <div class="msg g show"><span class="who">Gate ✓</span><span class="txt">Evidence complete: selector · precondition · impact · validation method · cheap fact → validate on fork.</span></div>
-      </div>
-
-      <div class="loop-viz" style="border-top:1px solid var(--line);">
-        <div class="gate-legend">
-          <span class="li"><b>The gate is deterministic.</b></span>
-          <span class="li"><span class="req">selector</span></span>
-          <span class="li"><span class="req">preconditions</span></span>
-          <span class="li"><span class="req">expected impact</span></span>
-          <span class="li"><span class="req">validation method</span></span>
-          <span class="li"><span class="req">supporting cheap fact</span></span>
+        <div class="gate-readout shut" id="gate-readout">
+          <div class="state" id="gate-state">GATE SHUT</div>
+          <div class="detail" id="gate-detail"></div>
         </div>
-        <p class="lead" style="margin-top:14px;">All five, or the hypothesis goes back to the loop with a recorded reject reason — it never reaches a validator, and never reaches a report.</p>
+        <div class="gate-count" id="gate-count">evidence present: <b>0</b> / 5</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ====================== UNIVERSALITY ====================== -->
-<section id="universality" aria-labelledby="uni-title">
+<!-- ================= 4 · VALIDATOR LADDER ================= -->
+<section id="validators" aria-labelledby="val-h">
   <div class="wrap">
-    <div class="sec-head reveal">
-      <span class="eyebrow"><span class="dot"></span> The key thesis</span>
-      <h2 id="uni-title">The loop doesn't care what it's reading.</h2>
-      <p class="lead">It is chain-agnostic and domain-agnostic. The same Researcher ⇄ Skeptic method runs over EVM bytecode — or, as Zcash showed, a ZK circuit.</p>
-    </div>
+    <p class="sec-tag"><span class="ord">4</span> the validator ladder</p>
+    <div class="sec-h"><h2 id="val-h">Only a reproducer escalates</h2></div>
+    <p class="sec-lead">
+      A passing consensus hypothesis is just a candidate. It climbs an escalation ladder; a stage promotes it only if the run
+      emits the evidence marker. No marker, no finding.
+    </p>
 
-    <div class="uni-grid">
-      <article class="card reveal">
-        <h3><svg width="22" height="22" viewBox="0 0 24 24" class="ic" style="color:var(--cyan)"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg> Chain-agnostic</h3>
-        <p>EVM adapters share one contract — chain id, RPC, explorer metadata, native currency. Adding a chain is a config, not a rewrite.</p>
-        <div class="chips">
-          <span class="chip"><span class="blip"></span>Ethereum</span>
-          <span class="chip"><span class="blip"></span>BSC</span>
-          <span class="chip"><span class="blip"></span>Base</span>
-          <span class="chip"><span class="blip"></span>Polygon</span>
-          <span class="chip"><span class="blip"></span>Arbitrum</span>
-          <span class="chip any"><span class="blip"></span>+ any EVM</span>
+    <div class="panel ladder">
+      <div class="rung">
+        <div class="step">1</div>
+        <div class="body">
+          <div class="name">Foundry pinned-fork test <span class="tool">forge test</span></div>
+          <p>Replays a concrete tx sequence against real chain state at the pinned block. The default, cheapest reproducer.</p>
         </div>
+        <div class="gate-marker">promote on<b>VALIDATED_EVIDENCE: true</b></div>
+      </div>
+      <div class="rung">
+        <div class="step">2</div>
+        <div class="body">
+          <div class="name">ItyFuzz <span class="tool">on-chain fuzzing</span></div>
+          <p>Searches for a value-moving sequence the fork test missed — stateful, on the same forked state.</p>
+        </div>
+        <div class="gate-marker">promote on<b>VALIDATED_EVIDENCE: true</b></div>
+      </div>
+      <div class="rung">
+        <div class="step">3</div>
+        <div class="body">
+          <div class="name">Symbolic <span class="tool">Mythril / Manticore</span></div>
+          <p>Solves path constraints for the preconditions and produces a concrete counterexample tx sequence, replayed on the fork.</p>
+        </div>
+        <div class="gate-marker">requires concrete<b>counterexample</b></div>
+      </div>
+      <div class="rung">
+        <div class="step">4</div>
+        <div class="body">
+          <div class="name">Property <span class="tool">Halmos / Echidna / Medusa</span></div>
+          <p>Checks an explicit invariant or postcondition with a shrunk counterexample and reproducible harness.</p>
+        </div>
+        <div class="gate-marker">requires shrunk<b>counterexample</b></div>
+      </div>
+      <div class="rung econ">
+        <div class="step">5</div>
+        <div class="body">
+          <div class="name">Economic checks <span class="tool">profit-after-gas</span></div>
+          <p>Profit after gas, liquidity, slippage, manipulation cost. Never promotes alone — a fork/fuzz/symbolic reproducer must show the impact first.</p>
+        </div>
+        <div class="gate-marker">gates positive<b>expected profit</b></div>
+      </div>
+      <div class="ladder-foot">
+        <svg width="18" height="18" viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M12 3l8 4v5c0 4.5-3.2 7.7-8 9-4.8-1.3-8-4.5-8-9V7l8-4Z"/><path d="M9 12l2 2 4-4"/></svg>
+        <span>Validated findings become an internal report. <b>Disclosure is manual</b> — the pipeline never auto-sends. <code>"a passing empty test is not evidence."</code></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 5 · REAL CASES ================= -->
+<section id="cases" aria-labelledby="cases-h">
+  <div class="wrap">
+    <p class="sec-tag"><span class="ord">5</span> grounding</p>
+    <div class="sec-h"><h2 id="cases-h">Why the question is real: classes that keep paying out</h2></div>
+    <p class="sec-lead">The six loop domains aren't abstract — each maps to a class that has drained real funds from deployed, often unaudited contracts in the last few months. These are the bugs a method like the one above would be hunting for.</p>
+
+    <div class="cases">
+      <article class="panel case feature">
+        <div class="top"><span class="nm">Truebit Protocol</span><span class="loss">~$26M · 8,535 ETH</span></div>
+        <span class="when">Jan 2026 · the running example</span>
+        <p>Integer overflow in a bonding-curve <code>getPurchasePrice</code> returned a <b style="color:var(--ink)">zero</b> price for a crafted mint → free mint → reserves drained. The contract was <b style="color:var(--ink)">~5 years old, unverified, and unaudited</b> — exactly the target profile this pipeline hunts.</p>
+        <div class="maps">accounting / share-math <span class="arrow">←</span> overflow → zero price → free mint</div>
       </article>
 
-      <article class="card reveal d1">
-        <h3><svg width="22" height="22" viewBox="0 0 24 24" class="ic" style="color:var(--violet)"><path d="M12 3v18M5 7l7 4 7-4M5 17l7-4 7 4"/></svg> Domain-agnostic</h3>
-        <p>The debate operates on whatever ground truth you hand it. Swap the artifact layer and the same loop reasons about different material.</p>
-        <div class="layers">
-          <div class="layer"><span class="k">[evm]</span><span>EVM bytecode &amp; storage — <b>millions of unaudited contracts</b></span></div>
-          <div class="layer"><span class="k">[zk]</span><span>ZK circuits &amp; gadgets — <b>the Zcash / halo2 class of bug</b></span></div>
-          <div class="layer"><span class="k">[…]</span><span>any artifact with selectors, state, and an oracle of correctness</span></div>
-        </div>
-        <p class="tieback">The Orchard bug and an EVM proxy hijack are the same shape to the loop: a hypothesis, a challenge, and an evidence gate.</p>
+      <article class="panel case">
+        <div class="top"><span class="nm">Balancer V2</span><span class="loss">~$128M</span></div>
+        <span class="when">Nov 2025</span>
+        <p>A rounding error in stable-pool invariant math, compounded dozens of times within a single transaction to skew pool prices.</p>
+        <div class="maps">accounting / share-math <span class="arrow">←</span> rounding</div>
+      </article>
+
+      <article class="panel case">
+        <div class="top"><span class="nm">Solv Protocol</span><span class="loss">135 → ~567M</span></div>
+        <span class="when">Jan 2026</span>
+        <p>A reentrancy <b style="color:var(--ink)">double-mint</b> turned 135 real tokens into ~567M counterfeit ones via a callback during minting.</p>
+        <div class="maps">external-calls / reentrancy <span class="arrow">←</span> callback</div>
       </article>
     </div>
   </div>
 </section>
 
-<!-- ====================== ARCHITECTURE ====================== -->
-<section id="arch" aria-labelledby="arch-title">
+<!-- ================= ARCHITECTURE (mermaid w/ fallback) ================= -->
+<section id="arch" aria-labelledby="arch-h">
   <div class="wrap">
-    <div class="sec-head reveal">
-      <span class="eyebrow"><span class="dot"></span> Architecture</span>
-      <h2 id="arch-title">End to end, the data flow.</h2>
-      <p class="lead">Reasoning-only findings die in the loop. Only fork / fuzz / symbolic / economic evidence survives into a report — and disclosure stays in human hands.</p>
-    </div>
+    <p class="sec-tag"><span class="ord">6</span> end to end</p>
+    <div class="sec-h"><h2 id="arch-h">The full data flow</h2></div>
+    <p class="sec-lead">Reasoning-only hypotheses die in the loop. Only fork / fuzz / symbolic / property / economic evidence survives into a report — and disclosure stays in human hands.</p>
 
-    <div class="mermaid-wrap reveal">
+    <div class="panel arch">
       <pre class="mermaid" id="mermaid-diagram">
 flowchart LR
-  A[Chain snapshot] --> B[Discovery + Triage]
-  B --> C[Dedaub decompile]
-  C --> D[Artifact bundle]
-  D --> E{Autoresearch loop}
-  E -->|Researcher| F[Hypotheses]
-  F -->|Skeptic| E
-  E --> G[Consensus gate]
-  G --> H[Validators: fork / fuzz / symbolic / economic]
-  H --> I[Evidence-gated report]
-  I --> J[Manual disclosure]
+  A[Chain snapshot] --> B[Triage]
+  B --> C[Resolve proxy]
+  C --> D[Dedaub decompile]
+  D --> E[Immutable artifact bundle]
+  E --> F{Autoresearch loop}
+  F -->|Researcher proposes| G[Hypothesis]
+  G -->|Skeptic challenges| F
+  F --> H{Consensus gate: 5 facts}
+  H -->|reject + reason| F
+  H -->|all 5 present| I[Validators: fork / fuzz / symbolic / property / economic]
+  I -->|VALIDATED_EVIDENCE| J[Evidence-gated report]
+  J --> K[Manual disclosure]
       </pre>
       <pre class="arch-fallback" id="arch-fallback" aria-hidden="true">  Chain snapshot
-       │
-       ▼
-  Discovery + Triage
-       │
-       ▼
-  Dedaub decompile ──▶ Artifact bundle
-                            │
-                            ▼
-                   ┌─ Autoresearch loop ◀─┐
-       Researcher ─┤                      ├─ Skeptic
-                   └──────────────────────┘
-                            │
-                            ▼
-                     Consensus gate
-                            │
-                            ▼
-   Validators: fork / fuzz / symbolic / economic
-                            │
-                            ▼
-                  Evidence-gated report
-                            │
-                            ▼
-                    Manual disclosure</pre>
+        |
+        v
+      Triage  -->  Resolve proxy  -->  Dedaub decompile
+                                            |
+                                            v
+                              Immutable artifact bundle
+                                            |
+                                            v
+                  +------ Autoresearch loop &lt;-----+
+   Researcher --->|  (proposes)        (challenges) |&lt;--- Skeptic
+                  +-------------------+-------------+
+                                      |
+                                      v
+                          Consensus gate (5 facts)
+                            |               |
+                  reject + reason       all 5 present
+                            ^               |
+                            +---&lt;loop       v
+              Validators: fork / fuzz / symbolic / property / economic
+                                      |
+                              VALIDATED_EVIDENCE
+                                      v
+                            Evidence-gated report
+                                      |
+                                      v
+                              Manual disclosure</pre>
+      <p class="arch-cap">// rendered with mermaid; static ASCII fallback shown if the CDN is unreachable</p>
     </div>
   </div>
 </section>
 
-<!-- ====================== ETHICS FOOTER ====================== -->
-<section id="ethics" aria-labelledby="ethics-title">
+<!-- ================= FOOTER ================= -->
+<footer>
   <div class="wrap">
-    <div class="ethics-card reveal">
-      <h2 id="ethics-title">
-        <svg width="26" height="26" viewBox="0 0 24 24" class="ic" style="color:var(--green)" aria-hidden="true"><path d="M12 3l8 4v5c0 4.5-3.2 7.7-8 9-4.8-1.3-8-4.5-8-9V7l8-4Z"/><path d="M9 12l2 2 4-4"/></svg>
-        Research &amp; educational concept
-      </h2>
-      <p>
-        This repository demonstrates a <strong style="color:var(--ink)">methodology</strong> — it is not a turnkey tool.
-        It ships without credentials or live target lists.
+    <div class="foot-grid">
+      <p class="ethics">
+        Research &amp; educational concept; ships without credentials or live target lists, offensive defaults disabled.
+        <span class="dot">·</span> Use only on testnet or contracts you are <b>explicitly authorized</b> to assess.
+        <span class="dot">·</span> Findings are disclosed responsibly and <b>manually</b> — the pipeline never auto-sends.
       </p>
-      <div class="pts">
-        <div class="pt"><svg width="18" height="18" viewBox="0 0 24 24" class="ic" style="color:var(--cyan)"><path d="M5 12l5 5L20 7"/></svg><span>Use only on testnet, or on contracts you are explicitly authorized to assess.</span></div>
-        <div class="pt"><svg width="18" height="18" viewBox="0 0 24 24" class="ic" style="color:var(--cyan)"><path d="M5 12l5 5L20 7"/></svg><span>Findings are disclosed <b style="color:var(--ink)">responsibly and manually</b> — the pipeline never auto-sends.</span></div>
-        <div class="pt"><svg width="18" height="18" viewBox="0 0 24 24" class="ic" style="color:var(--cyan)"><path d="M5 12l5 5L20 7"/></svg><span>High and critical findings require fork / fuzz / symbolic evidence before they exist as findings at all.</span></div>
-      </div>
-
-      <div class="foot">
-        <div class="sm">Built as a concept demonstration of autonomous security research.</div>
-        <div class="links">
-          <a href="https://github.com/DefaultPerson/audit-agents-system" target="_blank" rel="noopener noreferrer">
-            <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor" style="vertical-align:-2px;margin-right:6px;"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.33c-2.23.49-2.7-1.07-2.7-1.07-.36-.93-.89-1.18-.89-1.18-.73-.5.05-.49.05-.49.81.06 1.23.83 1.23.83.72 1.23 1.88.87 2.34.67.07-.52.28-.87.51-1.07-1.78-.2-3.65-.89-3.65-3.96 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.08-1.87 3.76-3.66 3.96.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
-            Repository
-          </a>
-          <a href="#hero">Back to top ↑</a>
-        </div>
+      <div class="foot-links">
+        <a href="https://github.com/DefaultPerson/audit-agents-system" target="_blank" rel="noopener noreferrer">github</a>
+        <a href="#pipeline">↑ top</a>
       </div>
     </div>
   </div>
-</section>
+</footer>
 
 <script>
 (function () {
   "use strict";
   var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* ---------- nav shadow on scroll ---------- */
-  var nav = document.getElementById("nav");
-  function onScroll() { if (nav) nav.classList.toggle("scrolled", window.scrollY > 12); }
-  window.addEventListener("scroll", onScroll, { passive: true });
-  onScroll();
+  /* ---------------- shared data ---------------- */
+  var ICONS = {
+    snapshot: '<path d="M3 7l9-4 9 4-9 4-9-4Z"/><path d="M3 12l9 4 9-4M3 17l9 4 9-4"/>',
+    decompile:'<path d="M8 5l-5 7 5 7M16 5l5 7-5 7"/>',
+    bundle:   '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16M9 4v16"/>',
+    loop:     '<path d="M3 12a9 9 0 1 0 3-6.7M3 4v4h4"/><circle cx="12" cy="12" r="2.4"/>',
+    gate:     '<path d="M12 3l8 4v5c0 4.5-3.2 7.7-8 9-4.8-1.3-8-4.5-8-9V7l8-4Z"/><path d="M9 12l2 2 4-4"/>',
+    validate: '<path d="M3 13l5-9 4 7 3-4 5 6"/><path d="M3 20h18"/>',
+    report:   '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/>',
+    disclose: '<path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7Z"/>'
+  };
 
-  /* ---------- scroll reveal ---------- */
-  var reveals = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
-  if (reduce || !("IntersectionObserver" in window)) {
-    reveals.forEach(function (el) { el.classList.add("in"); });
-  } else {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
-      });
-    }, { threshold: 0.16, rootMargin: "0px 0px -8% 0px" });
-    reveals.forEach(function (el) { io.observe(el); });
-  }
-
-  /* ---------- pipeline sequential light-up ---------- */
-  var stages = Array.prototype.slice.call(document.querySelectorAll("[data-stage]"));
-  if (reduce || !("IntersectionObserver" in window)) {
-    stages.forEach(function (s) { s.classList.add("lit"); });
-  } else {
-    var litOnce = false;
-    var pipeEl = document.getElementById("pipe");
-    var po = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (e.isIntersecting && !litOnce) {
-          litOnce = true;
-          stages.forEach(function (s, i) {
-            setTimeout(function () { s.classList.add("lit"); }, i * 420);
-          });
-          po.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.25 });
-    if (pipeEl) po.observe(pipeEl);
-  }
-
-  /* ---------- hero terminal typewriter ---------- */
-  var term = document.getElementById("term");
-  var lines = [
-    { cls: "p",    txt: "$ ", k: "c", t: "audit autoresearch 0x… --chain bsc --block 48123456" },
-    { cls: "m",    txt: "  building immutable artifact bundle … " , tail: "ok", tailCls: "ok" },
-    { cls: "m",    txt: "  selectors · storage · traces · balances frozen" },
-    { cls: "c",    txt: "  Researcher  ", k: "v", t: "→ selector 0x3659cfe6 upgrade path may be unguarded" },
-    { cls: "v",    txt: "  Skeptic     ", k: "m", t: "→ show access-control check + a storage fact" },
-    { cls: "ok",   txt: "  consensus gate  ", k: "ok", t: "evidence ✓ → validate on fork" },
-    { cls: "m",    txt: "  foundry pinned-fork test … ", tail: "PASS", tailCls: "ok" },
-    { cls: "m",    txt: "  finding → internal report · disclosure ", tail: "MANUAL", tailCls: "warn" },
+  var STAGES = [
+    { idx: "01", kind: "discovery + triage", title: "Snapshot & triage", icon: "snapshot",
+      in_: "A chain, at a pinned block height",
+      tr:  "Snapshots state, then triages for targets worth the spend: closed-source, high-value, old contracts, filtered by balance, proxy pattern and verification status.",
+      out: "A shortlist of candidate addresses",
+      body: "The pipeline doesn't scan everything. It looks for the Truebit profile: contracts holding real value that no one has ever audited.",
+      flag: "// old · unverified · holding funds = highest priority" },
+    { idx: "02", kind: "Dedaub + fallback", title: "Decompile bytecode", icon: "decompile",
+      in_: "Runtime bytecode (no source, no ABI)",
+      tr:  "Decompiles via Dedaub, with a bytecode / disassembly / storage-layout fallback for what it can't recover.",
+      out: "A decompiled view + recovered selectors",
+      body: "Recovered function names are hints, never facts. The loop is told to trust selectors, storage, and on-fork behavior — not the decompiler's guesses at intent.",
+      flag: "// decompiled names are hints, not facts" },
+    { idx: "03", kind: "evidence base", title: "Immutable artifact bundle", icon: "bundle",
+      in_: "Decompiled view + on-chain reads at the snapshot",
+      tr:  "Freezes ground truth: selectors, storage layout, recent traces/events, balances, proxy-admin evidence — under schema evm-artifact-bundle/v1.",
+      out: "A frozen, content-hashed bundle",
+      body: "Every later hypothesis must point back to a fact inside this bundle. That single rule is what keeps the debate honest — and it's what the gate checks against.",
+      flag: "// every claim must cite this bundle" },
+    { idx: "04", kind: "Researcher ⇄ Skeptic", title: "Autoresearch loop", icon: "loop",
+      in_: "The artifact bundle + six specialist goals",
+      tr:  "Two different LLMs argue across domains. The Researcher proposes an attack; the Skeptic demands the missing fact. Bounded by iteration / cost / time budgets.",
+      out: "Candidate hypotheses, each with a receipt",
+      body: "Specialist domains are bounded goals, not permanent agents. Repeated rejections on the same missing fact raise a 'stuck' signal and trigger replanning.",
+      flag: "// see section 2 — step it through" },
+    { idx: "05", kind: "deterministic", title: "Consensus gate", icon: "gate",
+      in_: "A proposed hypothesis",
+      tr:  "Checks five required facts. All present → promote. Any missing → reject with the exact missing fact recorded.",
+      out: "Either a validation candidate, or a logged rejection",
+      body: "This is plain deterministic code, not a model vote. A rejected hypothesis never reaches a validator and never reaches a report — it goes back to the loop.",
+      flag: "// see section 3 — flip the requirements" },
+    { idx: "06", kind: "evidence-gated", title: "Validators", icon: "validate",
+      in_: "A consensus hypothesis + a verification package",
+      tr:  "Foundry fork → ItyFuzz → symbolic → property → economic. A stage promotes to VALIDATED only on the evidence marker.",
+      out: "A validated finding — or nothing",
+      body: "Each validator writes its output and is scanned for VALIDATED_EVIDENCE: true. Scaffold tests and empty fuzz runs are explicitly refused as evidence.",
+      flag: "// see section 4 — the ladder" },
+    { idx: "07", kind: "internal", title: "Evidence-gated report", icon: "report",
+      in_: "Validated findings only",
+      tr:  "Assembles an internal report: hypothesis, reproducer, validator output, evidence manifest. Rejected and inconclusive items are kept as memory, not findings.",
+      out: "An internal, reproducible report",
+      body: "If nothing validated, there is no report of a vulnerability — only a record of what was checked and rejected.",
+      flag: "// no reproducer = not a finding" },
+    { idx: "08", kind: "human-in-the-loop", title: "Manual disclosure", icon: "disclose",
+      in_: "An internal report",
+      tr:  "A human reviews and discloses responsibly. There is no automated send path by design.",
+      out: "Responsible disclosure (manual)",
+      body: "Disclosure is deliberately outside the automation. The pipeline produces evidence; a person decides what to do with it.",
+      flag: "// disclosure is manual — never auto-sent", ok: true }
   ];
-  function renderTermStatic() {
-    if (!term) return;
-    term.innerHTML = "";
-    lines.forEach(function (l) {
-      var d = document.createElement("div");
-      d.className = "ln";
-      var s1 = '<span class="' + l.cls + '">' + escapeHtml(l.txt) + "</span>";
-      var s2 = l.t ? '<span class="' + (l.k || "m") + '">' + escapeHtml(l.t) + "</span>" : "";
-      var s3 = l.tail ? '<span class="' + (l.tailCls || "m") + '">' + escapeHtml(l.tail) + "</span>" : "";
-      d.innerHTML = s1 + s2 + s3;
-      term.appendChild(d);
-    });
-  }
-  function escapeHtml(s) { return String(s).replace(/[&<>]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]; }); }
 
-  function typeTerm() {
-    if (!term) return;
-    term.innerHTML = "";
-    var li = 0;
-    function nextLine() {
-      if (li >= lines.length) {
-        var cur = document.createElement("span"); cur.className = "cursor";
-        var last = term.lastChild; if (last) last.appendChild(cur);
-        return;
-      }
-      var l = lines[li];
-      var row = document.createElement("div"); row.className = "ln";
-      var pre = document.createElement("span"); pre.className = l.cls; pre.textContent = l.txt;
-      row.appendChild(pre);
-      var typed = document.createElement("span"); typed.className = l.k || "m"; row.appendChild(typed);
-      term.appendChild(row);
-      term.scrollTop = term.scrollHeight;
-      var full = l.t || "";
-      var ci = 0;
-      var cursor = document.createElement("span"); cursor.className = "cursor"; row.appendChild(cursor);
-      function typeChar() {
-        if (ci < full.length) {
-          typed.textContent += full.charAt(ci++);
-          setTimeout(typeChar, 16 + Math.random() * 22);
-        } else {
-          if (l.tail) {
-            var tl = document.createElement("span"); tl.className = l.tailCls || "m"; tl.textContent = l.tail; row.insertBefore(tl, cursor);
-          }
-          row.removeChild(cursor);
-          li++;
-          setTimeout(nextLine, l.cls === "p" ? 240 : 360);
-        }
-      }
-      setTimeout(typeChar, 120);
+  /* ---------------- 1 · pipeline schematic ---------------- */
+  var flow = document.getElementById("pipe-flow");
+  function escapeHtml(s){ return String(s).replace(/[&<>]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]; }); }
+
+  function buildPipeline() {
+    var html = "";
+    STAGES.forEach(function (s, i) {
+      var isFirst = i === 0, isLast = i === STAGES.length - 1;
+      html +=
+        '<button class="node" role="listitem" type="button" aria-expanded="false" data-stage="' + i + '" id="node-' + i + '" aria-controls="detail-' + i + '">' +
+          (isFirst ? '' : '<span class="port in" aria-hidden="true"></span>') +
+          (isLast  ? '' : '<span class="port out" aria-hidden="true"></span>') +
+          '<span class="nrow"><span class="nidx">' + s.idx + '</span>' +
+            '<svg class="icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><g class="ic">' + ICONS[s.icon] + '</g></svg></span>' +
+          '<span class="ntitle">' + escapeHtml(s.title) + '</span>' +
+          '<span class="nkind">' + escapeHtml(s.kind) + '</span>' +
+          '<svg class="chev" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path class="ic" d="M6 9l6 6 6-6"/></svg>' +
+        '</button>';
+    });
+    flow.innerHTML = html;
+  }
+  buildPipeline();
+
+  var openDetailEl = null, openStageIdx = null;
+  function closeDetail() {
+    if (openDetailEl) { openDetailEl.remove(); openDetailEl = null; }
+    if (openStageIdx !== null) {
+      var btn = document.getElementById("node-" + openStageIdx);
+      if (btn) btn.setAttribute("aria-expanded", "false");
+      openStageIdx = null;
     }
-    nextLine();
   }
-  if (reduce) { renderTermStatic(); }
-  else {
-    var started = false;
-    if ("IntersectionObserver" in window && term) {
-      var to = new IntersectionObserver(function (e) {
-        if (e[0].isIntersecting && !started) { started = true; typeTerm(); to.disconnect(); }
-      }, { threshold: .3 });
-      to.observe(term);
-    } else { typeTerm(); }
-  }
+  function openDetail(i) {
+    var s = STAGES[i];
+    var btn = document.getElementById("node-" + i);
+    var detail = document.createElement("div");
+    detail.className = "node-detail";
+    detail.id = "detail-" + i;
+    detail.setAttribute("role", "region");
+    detail.setAttribute("aria-label", s.title + " — mechanics");
+    detail.innerHTML =
+      '<div class="hd"><svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><g class="ic">' + ICONS[s.icon] + '</g></svg>' +
+        escapeHtml(s.idx + " · " + s.title) +
+        '<button class="x" type="button" aria-label="Close ' + escapeHtml(s.title) + ' panel">✕</button></div>' +
+      '<div class="nd-io">' +
+        '<div class="cell in"><div class="lab">▸ in</div><div class="v">' + escapeHtml(s.in_) + '</div></div>' +
+        '<div class="cell"><div class="lab">⚙ transforms</div><div class="v">' + escapeHtml(s.tr) + '</div></div>' +
+        '<div class="cell out"><div class="lab">▸ out</div><div class="v">' + escapeHtml(s.out) + '</div></div>' +
+      '</div>' +
+      '<div class="nd-body"><p>' + escapeHtml(s.body) + '</p><div class="flag' + (s.ok ? ' ok' : '') + '">' + escapeHtml(s.flag) + '</div></div>';
 
-  /* ---------- cycling exchange snippets + domain highlight ---------- */
-  var exchange = document.getElementById("exchange");
-  var domainChips = Array.prototype.slice.call(document.querySelectorAll("#domains .dchip"));
-  var sets = [
-    { d: 0, msgs: [
-      ["r", "Researcher →", 'selector <code>0x3659cfe6</code> looks like an unguarded upgrade path on the proxy.'],
-      ["s", "Skeptic →", "Show the missing access-control check and a storage fact that proves the slot is writable."],
-      ["g", "Gate ✓", "Evidence complete → validate on a pinned fork."]
-    ]},
-    { d: 2, msgs: [
-      ["r", "Researcher →", 'the <code>deposit()</code> share math rounds in the vault’s favour — first-depositor inflation?'],
-      ["s", "Skeptic →", "Prove non-zero impact after gas, and cite the rounding op in the artifact bundle."],
-      ["g", "Gate ✓", "Impact + cheap fact present → validate on a pinned fork."]
-    ]},
-    { d: 3, msgs: [
-      ["r", "Researcher →", "the price read trusts a single DEX spot pool — manipulable mid-tx."],
-      ["s", "Skeptic ✗", "No selector path to the sink. Reasoning only — reject, log reason."],
-      ["g", "Gate ✗", "Missing evidence → back to the loop. Never reaches a validator."]
-    ]}
+    // insert after the end of the row containing this node so it spans full width below it
+    var cols = getComputedStyle(flow).gridTemplateColumns.split(" ").length;
+    var rowEnd = (Math.floor(i / cols) + 1) * cols - 1;
+    var refIdx = Math.min(rowEnd, STAGES.length - 1);
+    var refBtn = document.getElementById("node-" + refIdx);
+    if (refBtn && refBtn.nextSibling) flow.insertBefore(detail, refBtn.nextSibling);
+    else flow.appendChild(detail);
+
+    btn.setAttribute("aria-expanded", "true");
+    openDetailEl = detail;
+    openStageIdx = i;
+
+    detail.querySelector(".x").addEventListener("click", function () {
+      closeDetail();
+      btn.focus();
+    });
+    if (!reduce) detail.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+  flow.addEventListener("click", function (e) {
+    var node = e.target.closest(".node");
+    if (!node) return;
+    var i = parseInt(node.getAttribute("data-stage"), 10);
+    if (openStageIdx === i) { closeDetail(); }
+    else { closeDetail(); openDetail(i); }
+  });
+  // reflow open detail position on resize (column count changes)
+  var rt;
+  window.addEventListener("resize", function () {
+    if (openStageIdx === null) return;
+    clearTimeout(rt);
+    rt = setTimeout(function () { var i = openStageIdx; closeDetail(); openDetail(i); }, 200);
+  });
+
+  /* ---------------- 2 · the loop step-through ---------------- */
+  var DOMAINS = [
+    "auth / upgradeability", "proxy / storage / delegatecall", "accounting / share-math",
+    "oracle / price / liquidity", "state-machine / lifecycle", "external-calls / reentrancy"
   ];
-  function showSet(idx) {
-    if (!exchange) return;
-    var set = sets[idx % sets.length];
-    domainChips.forEach(function (c, i) { c.classList.toggle("active", i === set.d); });
-    exchange.innerHTML = "";
-    set.msgs.forEach(function (m, i) {
-      var row = document.createElement("div");
-      row.className = "msg " + m[0];
-      row.innerHTML = '<span class="who">' + m[1] + '</span><span class="txt">' + m[2] + "</span>";
-      exchange.appendChild(row);
-      if (!reduce) setTimeout(function () { row.classList.add("show"); }, 180 + i * 520);
-      else row.classList.add("show");
-    });
-  }
-  if (reduce) {
-    // leave static first set (already in markup); just highlight a domain
-    if (domainChips[0]) domainChips[0].classList.add("active");
-  } else {
-    var si = 0;
-    showSet(0);
-    setInterval(function () { si++; showSet(si); }, 6600);
-  }
+  // worked example: Truebit-class bonding-curve overflow (accounting / share-math)
+  var TURNS = [
+    { who: "Researcher →", cls: "r", domain: 2,
+      txt: 'Selector <code>0xd0e30db0</code>-style mint path prices via <code>getPurchasePrice()</code>. The bonding-curve multiply looks unchecked — could it overflow to a zero price?' },
+    { who: "Skeptic →", cls: "s", domain: 2,
+      txt: 'A hunch is not a hypothesis. Cite the selector in the artifact bundle and the storage slot the price reads from — prove the math is reachable.' },
+    { who: "Researcher →", cls: "r", domain: 2,
+      txt: 'Bundle confirms the selector and a <code>uint256</code> reserve slot with no SafeMath wrapper in the decompiled slice. Precondition: a crafted amount wraps the product to 0.' },
+    { who: "Skeptic →", cls: "s", domain: 2,
+      txt: 'Then state the impact and how you would prove it — vaguely "bad math" earns nothing from the gate.' },
+    { who: "Researcher →", cls: "r", domain: 2,
+      txt: 'Impact: zero price → free mint → reserves drained. Validation: Foundry pinned-fork test replaying the crafted mint; property check on the supply invariant.' },
+    { who: "Gate ✓", cls: "g", domain: 2,
+      txt: 'All five present — selector · precondition · impact · validation method · supporting fact. Promote to the validator ladder.' }
+  ];
+  var loopTurnsEl = document.getElementById("loop-turns");
+  var loopDomainEl = document.getElementById("loop-domain");
+  var loopProgEl = document.getElementById("loop-progress");
+  var nextBtn = document.getElementById("loop-next");
+  var resetBtn = document.getElementById("loop-reset");
+  var wRS = document.getElementById("w-rs"), wSR = document.getElementById("w-sr"), wGV = document.getElementById("w-gv");
+  var nR = document.getElementById("n-researcher"), nS = document.getElementById("n-skeptic"), nG = document.getElementById("n-gate");
+  var loopStep = 0;
 
-  /* ---------- mermaid (graceful) ---------- */
-  function loadMermaid() {
-    return new Promise(function (resolve, reject) {
-      var s = document.createElement("script");
-      s.src = "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js";
-      s.async = true;
-      s.onload = resolve;
-      s.onerror = reject;
-      document.head.appendChild(s);
+  function highlightDiagram(turn) {
+    [wRS, wSR, wGV].forEach(function (w) { if (w) { w.classList.remove("hot"); w.classList.add("dim"); } });
+    [nR, nS, nG].forEach(function (n) { if (n) n.classList.add("dim"); });
+    if (!turn) return;
+    if (turn.cls === "r") { if (wRS){wRS.classList.add("hot");wRS.classList.remove("dim");} if(nR)nR.classList.remove("dim"); if(nS)nS.classList.remove("dim"); }
+    else if (turn.cls === "s") { if (wSR){wSR.classList.add("hot");wSR.classList.remove("dim");} if(nS)nS.classList.remove("dim"); if(nR)nR.classList.remove("dim"); }
+    else if (turn.cls === "g" || turn.cls === "x") { if (wGV){wGV.classList.add("hot");wGV.classList.remove("dim");} if(nG)nG.classList.remove("dim"); }
+  }
+  function renderTurn(idx) {
+    var t = TURNS[idx];
+    var row = document.createElement("div");
+    row.className = "turn " + t.cls;
+    row.innerHTML = '<span class="who">' + t.who + '</span><span class="txt">' + t.txt + '</span>';
+    loopTurnsEl.appendChild(row);
+    if (loopDomainEl) loopDomainEl.innerHTML = 'domain · <b>' + DOMAINS[t.domain] + '</b>';
+    highlightDiagram(t);
+    setDomainRail(t.domain);
+    if (reduce) row.classList.add("show");
+    else requestAnimationFrame(function () { requestAnimationFrame(function () { row.classList.add("show"); }); });
+  }
+  function updateProgress() {
+    loopProgEl.innerHTML = 'turn <b>' + loopStep + '</b> / ' + TURNS.length;
+    nextBtn.disabled = loopStep >= TURNS.length;
+    if (loopStep >= TURNS.length) {
+      nextBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> consensus reached';
+    }
+  }
+  function loopReset() {
+    loopStep = 0; loopTurnsEl.innerHTML = "";
+    if (loopDomainEl) loopDomainEl.innerHTML = 'domain · <b>—</b>';
+    nextBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M5 4l10 8-10 8zM19 4v16"/></svg> Next turn';
+    highlightDiagram(null);
+    setDomainRail(-1);
+    updateProgress();
+  }
+  function loopNext() {
+    if (loopStep >= TURNS.length) return;
+    renderTurn(loopStep);
+    loopStep++;
+    updateProgress();
+  }
+  nextBtn.addEventListener("click", loopNext);
+  resetBtn.addEventListener("click", function(){ loopReset(); nextBtn.focus(); });
+
+  // domain rail
+  var domainRail = document.getElementById("domain-rail");
+  domainRail.innerHTML = DOMAINS.map(function (d, i) {
+    return '<span class="dc" data-d="' + i + '">' + d + '</span>';
+  }).join("");
+  function setDomainRail(active) {
+    Array.prototype.forEach.call(domainRail.children, function (c, i) {
+      c.classList.toggle("on", i === active);
     });
   }
+  loopReset();
+
+  /* ---------------- 3 · consensus gate ---------------- */
+  var REQS = [
+    { name: "Affected selector or fallback path", key: "affectedSelectors",
+      ex: 'e.g. <code>0x3659cfe6</code> (upgradeTo) or a fallback dispatch path' },
+    { name: "Explicit preconditions", key: "preconditions",
+      ex: 'the exact state the attack assumes — "reserve slot writable", "caller unprivileged"' },
+    { name: "Expected impact", key: "expectedImpact",
+      ex: 'concrete loss — "zero price → free mint → reserves drained"' },
+    { name: "A validation method", key: "validationMethods",
+      ex: 'how it would be proven — foundry_fork, ityfuzz, symbolic, property, economic' },
+    { name: "≥1 supporting cheap fact", key: "evidenceRefs",
+      ex: 'a fact already in the artifact bundle — <code>selector:0x…</code>, a storage read' }
+  ];
+  var reqListEl = document.getElementById("gate-req-list");
+  reqListEl.innerHTML = REQS.map(function (r, i) {
+    return '<label class="req">' +
+        '<input type="checkbox" data-req="' + i + '" />' +
+        '<span class="box" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 24 24" class="ic" style="stroke-width:3"><path d="M5 12l5 5L20 7"/></svg></span>' +
+        '<span class="meta"><span class="name">' + r.name + '</span><span class="ex">' + r.ex + '</span></span>' +
+        '<span class="key" aria-hidden="true">' + r.key + '</span>' +
+      '</label>';
+  }).join("");
+
+  var gateSvg = document.getElementById("gate-svg");
+  var gateReadout = document.getElementById("gate-readout");
+  var gateState = document.getElementById("gate-state");
+  var gateDetail = document.getElementById("gate-detail");
+  var gateCount = document.getElementById("gate-count");
+
+  function evalGate() {
+    var boxes = reqListEl.querySelectorAll('input[type="checkbox"]');
+    var present = 0, missing = [];
+    Array.prototype.forEach.call(boxes, function (b, i) {
+      if (b.checked) present++;
+      else missing.push(REQS[i].name.replace(/^≥1 /, "").toLowerCase());
+    });
+    var open = present === REQS.length;
+    gateSvg.classList.toggle("gate-open", open);
+    gateSvg.classList.toggle("gate-shut", !open);
+    gateReadout.classList.toggle("open", open);
+    gateReadout.classList.toggle("shut", !open);
+    gateCount.innerHTML = 'evidence present: <b>' + present + '</b> / ' + REQS.length;
+    if (open) {
+      gateState.textContent = "✓ GATE OPEN";
+      gateDetail.innerHTML = "All five facts present. Promote to the validator ladder.";
+    } else {
+      gateState.textContent = "✕ GATE SHUT";
+      gateDetail.innerHTML = 'Consensus gate rejected; missing: <span class="miss">' + missing.join(", ") + '</span>. Back to the loop with a recorded reason.';
+    }
+  }
+  reqListEl.addEventListener("change", evalGate);
+  evalGate();
+
+  /* ---------------- mermaid (graceful, optional) ---------------- */
   function showArchFallback() {
     var d = document.getElementById("mermaid-diagram");
     var f = document.getElementById("arch-fallback");
     if (d) d.style.display = "none";
     if (f) { f.classList.add("show"); f.setAttribute("aria-hidden", "false"); }
   }
+  function loadMermaid() {
+    return new Promise(function (resolve, reject) {
+      var s = document.createElement("script");
+      s.src = "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js";
+      s.async = true; s.onload = resolve; s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
   try {
     loadMermaid().then(function () {
       try {
         if (!window.mermaid) { showArchFallback(); return; }
         window.mermaid.initialize({
-          startOnLoad: false,
-          theme: "dark",
-          securityLevel: "strict",
+          startOnLoad: false, theme: "base", securityLevel: "strict",
           themeVariables: {
-            background: "#0c121e",
-            primaryColor: "#0f1626",
-            primaryBorderColor: "#22d3ee",
-            primaryTextColor: "#e8eefb",
-            lineColor: "#6b7791",
-            secondaryColor: "#16203a",
-            tertiaryColor: "#0f1626",
-            fontFamily: "JetBrains Mono, ui-monospace, monospace",
-            fontSize: "15px"
+            background: "#0f1824", primaryColor: "#122031", primaryBorderColor: "#5ea9d6",
+            primaryTextColor: "#d6e6ef", lineColor: "#6e9ec0", secondaryColor: "#0d141e",
+            tertiaryColor: "#122031", fontFamily: "IBM Plex Mono, ui-monospace, monospace", fontSize: "14px"
           }
         });
         window.mermaid.run({ querySelector: ".mermaid" }).catch(showArchFallback);
       } catch (e) { showArchFallback(); }
     }).catch(showArchFallback);
   } catch (e) { showArchFallback(); }
-
-  /* ---------- hero background canvas: drifting grid + particles ---------- */
-  var canvas = document.getElementById("bg-canvas");
-  if (canvas && !reduce) {
-    var ctx = canvas.getContext("2d");
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    var W = 0, H = 0, particles = [];
-    function resize() {
-      W = canvas.clientWidth; H = canvas.clientHeight;
-      canvas.width = W * dpr; canvas.height = H * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      var count = Math.min(70, Math.floor(W * H / 22000));
-      particles = [];
-      for (var i = 0; i < count; i++) {
-        particles.push({
-          x: Math.random() * W, y: Math.random() * H,
-          vx: (Math.random() - .5) * .25, vy: (Math.random() - .5) * .25,
-          r: Math.random() * 1.6 + .6
-        });
-      }
-    }
-    var t0 = 0;
-    function draw(ts) {
-      if (!ctx) return;
-      var t = ts * 0.00006;
-      ctx.clearRect(0, 0, W, H);
-      // drifting grid
-      var gap = 46, ox = (Math.sin(t) * 18), oy = (Math.cos(t * .8) * 18);
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = "rgba(120,150,200,0.05)";
-      ctx.beginPath();
-      for (var x = (ox % gap); x < W; x += gap) { ctx.moveTo(x, 0); ctx.lineTo(x, H); }
-      for (var y = (oy % gap); y < H; y += gap) { ctx.moveTo(0, y); ctx.lineTo(W, y); }
-      ctx.stroke();
-      // particles + links
-      for (var i = 0; i < particles.length; i++) {
-        var p = particles[i];
-        p.x += p.vx; p.y += p.vy;
-        if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
-        if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
-        ctx.beginPath();
-        ctx.fillStyle = "rgba(103,232,249,0.5)";
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fill();
-        for (var j = i + 1; j < particles.length; j++) {
-          var q = particles[j];
-          var dx = p.x - q.x, dy = p.y - q.y, dist = dx * dx + dy * dy;
-          if (dist < 16000) {
-            var a = (1 - dist / 16000) * 0.16;
-            ctx.strokeStyle = "rgba(120,180,230," + a + ")";
-            ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
-          }
-        }
-      }
-      raf = requestAnimationFrame(draw);
-    }
-    var raf;
-    resize();
-    raf = requestAnimationFrame(draw);
-    var rt;
-    window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(resize, 160); });
-    // pause when hero off-screen to save battery
-    if ("IntersectionObserver" in window) {
-      var hero = document.getElementById("hero");
-      var ho = new IntersectionObserver(function (e) {
-        if (e[0].isIntersecting) { if (!raf) raf = requestAnimationFrame(draw); }
-        else { if (raf) { cancelAnimationFrame(raf); raf = null; } }
-      }, { threshold: 0 });
-      if (hero) ho.observe(hero);
-    }
-  }
 })();
 </script>
 </body>
