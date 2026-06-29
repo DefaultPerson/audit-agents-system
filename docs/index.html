@@ -4,9 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="color-scheme" content="dark" />
-<title>How are so many bugs found this fast? — one conjecture</title>
-<meta name="description" content="Crypto theft surged to ~$3.4B in 2025. How are bugs in old, closed-source, never-audited EVM contracts found and drained so fast? An interactive engineering schematic lays out one plausible method: an autonomous, AI-driven Researcher ⇄ Skeptic research pipeline behind a deterministic evidence gate. A speculative concept demonstration — not a product, not an accusation." />
-<meta property="og:title" content="How are so many bugs found this fast? — one conjecture" />
+<title>How are so many bugs found this fast? – one conjecture</title>
+<meta name="description" content="Crypto theft surged to ~$3.4B in 2025. How are bugs in old, closed-source, never-audited EVM contracts found and drained so fast? An interactive engineering schematic lays out one plausible method: an autonomous, AI-driven Researcher ⇄ Skeptic research pipeline behind a deterministic evidence gate. A speculative concept demonstration – not a product, not an accusation." />
+<meta property="og:title" content="How are so many bugs found this fast? – one conjecture" />
 <meta property="og:description" content="An interactive schematic of one plausible method behind the surge in EVM exploits: an autonomous, evidence-gated AI research pipeline. A speculative concept demonstration." />
 <meta property="og:type" content="website" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -14,7 +14,7 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
   :root {
-    /* blueprint / phosphor schematic palette — deliberately NOT the cyan+violet SaaS gradient */
+    /* blueprint / phosphor schematic palette – deliberately NOT the cyan+violet SaaS gradient */
     --paper:      #0a1018;          /* deep blueprint ink */
     --paper-2:    #0d141e;
     --panel:      #0f1824;
@@ -26,7 +26,7 @@
     --ink:        #d6e6ef;          /* light cyanish ink on blueprint */
     --ink-soft:   #9db4c4;
     --ink-mute:   #5f7689;
-    --phos:       #6fe3a8;          /* phosphor green — the "live / pass" signal */
+    --phos:       #6fe3a8;          /* phosphor green – the "live / pass" signal */
     --phos-dim:   #3f9d72;
     --amber:      #f2b65c;          /* annotations / caution */
     --amber-dim:  #b3823c;
@@ -484,13 +484,13 @@
 <!-- ================= INTRO ANNOTATION ================= -->
 <div class="intro">
   <div class="wrap">
-    <p class="kicker">// an open question — and one conjecture about the answer</p>
+    <p class="kicker">// an open question – and one conjecture about the answer</p>
     <h1>How are so many bugs being found and drained <span class="hi">this fast</span>?</h1>
     <p class="sub">
-      Crypto theft has surged — <span class="mono" style="color:var(--rust)">~$3.4B in 2025</span>, with Truebit, Balancer
+      Crypto theft has surged – <span class="mono" style="color:var(--rust)">~$3.4B in 2025</span>, with Truebit, Balancer
       and Solv each draining tens to hundreds of millions in the last few months. The targets keep looking the same:
       old, closed-source, never-audited contracts. So how does anyone find these bugs at scale, before the defenders do?
-      This page lays out <b style="color:var(--ink)">one plausible method</b> — automated, AI-driven vulnerability research —
+      This page lays out <b style="color:var(--ink)">one plausible method</b> – automated, AI-driven vulnerability research –
       as an interactive schematic. The diagrams are live: click a stage, step the loop, flip the gate.
     </p>
     <p class="note">
@@ -508,10 +508,10 @@
   <div class="wrap">
     <p class="sec-tag"><span class="ord">1</span> the pipeline</p>
     <div class="sec-h"><h2 id="pipeline-h">From raw bytecode to a validated finding</h2></div>
-    <p class="sec-lead">Each stage hands the next an immutable artifact. Click a node to open its mechanics — what goes <span style="color:var(--blue)">in</span>, what it transforms, what comes <span style="color:var(--phos)">out</span>.</p>
+    <p class="sec-lead">Each stage hands the next an immutable artifact. Click a node to open its mechanics – what goes <span style="color:var(--blue)">in</span>, what it transforms, what comes <span style="color:var(--phos)">out</span>.</p>
 
     <div class="panel pipe-board">
-      <div class="pipe-flow" id="pipe-flow" role="list" aria-label="Pipeline stages — activate a stage to expand its mechanics"></div>
+      <div class="pipe-flow" id="pipe-flow" role="list" aria-label="Pipeline stages – activate a stage to expand its mechanics"></div>
     </div>
   </div>
 </section>
@@ -523,7 +523,7 @@
     <div class="sec-h"><h2 id="loop-h">Researcher ⇄ Skeptic, one turn at a time</h2></div>
     <p class="sec-lead">
       Two models from different families argue across six specialist domains. Step through a worked example on
-      <b style="color:var(--ink)">Truebit</b>-class bytecode — the Researcher proposes, the Skeptic demands proof, until the gate has what it needs.
+      <b style="color:var(--ink)">Truebit</b>-class bytecode – the Researcher proposes, the Skeptic demands proof, until the gate has what it needs.
     </p>
 
     <div class="panel loop-board">
@@ -572,7 +572,7 @@
         </div>
 
         <div class="loop-feed">
-          <div class="loop-domain" id="loop-domain">domain · <b>—</b></div>
+          <div class="loop-domain" id="loop-domain">domain · <b>–</b></div>
           <div id="loop-turns" aria-live="polite"></div>
         </div>
       </div>
@@ -598,7 +598,7 @@
 <section id="gate" aria-labelledby="gate-h">
   <div class="wrap">
     <p class="sec-tag"><span class="ord">3</span> the consensus gate</p>
-    <div class="sec-h"><h2 id="gate-h">Evidence, not opinion — flip the requirements</h2></div>
+    <div class="sec-h"><h2 id="gate-h">Evidence, not opinion – flip the requirements</h2></div>
     <p class="sec-lead">
       The gate is deterministic. A hypothesis is promoted to validation only when <b style="color:var(--ink)">all five</b> facts are
       present; miss one and it bounces back to the loop with a recorded reason. Toggle each requirement and watch the gate.
@@ -606,7 +606,7 @@
 
     <div class="panel gate-board">
       <div class="gate-reqs">
-        <p class="hint">// src: passes_consensus_gate(hypothesis) — toggle to simulate</p>
+        <p class="hint">// src: passes_consensus_gate(hypothesis) – toggle to simulate</p>
         <div id="gate-req-list"></div>
       </div>
 
@@ -660,7 +660,7 @@
         <div class="step">2</div>
         <div class="body">
           <div class="name">ItyFuzz <span class="tool">on-chain fuzzing</span></div>
-          <p>Searches for a value-moving sequence the fork test missed — stateful, on the same forked state.</p>
+          <p>Searches for a value-moving sequence the fork test missed – stateful, on the same forked state.</p>
         </div>
         <div class="gate-marker">promote on<b>VALIDATED_EVIDENCE: true</b></div>
       </div>
@@ -684,13 +684,13 @@
         <div class="step">5</div>
         <div class="body">
           <div class="name">Economic checks <span class="tool">profit-after-gas</span></div>
-          <p>Profit after gas, liquidity, slippage, manipulation cost. Never promotes alone — a fork/fuzz/symbolic reproducer must show the impact first.</p>
+          <p>Profit after gas, liquidity, slippage, manipulation cost. Never promotes alone – a fork/fuzz/symbolic reproducer must show the impact first.</p>
         </div>
         <div class="gate-marker">gates positive<b>expected profit</b></div>
       </div>
       <div class="ladder-foot">
         <svg width="18" height="18" viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M12 3l8 4v5c0 4.5-3.2 7.7-8 9-4.8-1.3-8-4.5-8-9V7l8-4Z"/><path d="M9 12l2 2 4-4"/></svg>
-        <span>Validated findings become an internal report. <b>Disclosure is manual</b> — the pipeline never auto-sends. <code>"a passing empty test is not evidence."</code></span>
+        <span>Validated findings become an internal report. <b>Disclosure is manual</b> – the pipeline never auto-sends. <code>"a passing empty test is not evidence."</code></span>
       </div>
     </div>
   </div>
@@ -701,13 +701,13 @@
   <div class="wrap">
     <p class="sec-tag"><span class="ord">5</span> grounding</p>
     <div class="sec-h"><h2 id="cases-h">Why the question is real: classes that keep paying out</h2></div>
-    <p class="sec-lead">The six loop domains aren't abstract — each maps to a class that has drained real funds from deployed, often unaudited contracts in the last few months. These are the bugs a method like the one above would be hunting for.</p>
+    <p class="sec-lead">The six loop domains aren't abstract – each maps to a class that has drained real funds from deployed, often unaudited contracts in the last few months. These are the bugs a method like the one above would be hunting for.</p>
 
     <div class="cases">
       <article class="panel case feature">
         <div class="top"><span class="nm">Truebit Protocol</span><span class="loss">~$26M · 8,535 ETH</span></div>
         <span class="when">Jan 2026 · the running example</span>
-        <p>Integer overflow in a bonding-curve <code>getPurchasePrice</code> returned a <b style="color:var(--ink)">zero</b> price for a crafted mint → free mint → reserves drained. The contract was <b style="color:var(--ink)">~5 years old, unverified, and unaudited</b> — exactly the target profile this pipeline hunts.</p>
+        <p>Integer overflow in a bonding-curve <code>getPurchasePrice</code> returned a <b style="color:var(--ink)">zero</b> price for a crafted mint → free mint → reserves drained. The contract was <b style="color:var(--ink)">~5 years old, unverified, and unaudited</b> – exactly the target profile a method like this would prioritize.</p>
         <div class="maps">accounting / share-math <span class="arrow">←</span> overflow → zero price → free mint</div>
       </article>
 
@@ -733,7 +733,7 @@
   <div class="wrap">
     <p class="sec-tag"><span class="ord">6</span> end to end</p>
     <div class="sec-h"><h2 id="arch-h">The full data flow</h2></div>
-    <p class="sec-lead">Reasoning-only hypotheses die in the loop. Only fork / fuzz / symbolic / property / economic evidence survives into a report — and disclosure stays in human hands.</p>
+    <p class="sec-lead">Reasoning-only hypotheses die in the loop. Only fork / fuzz / symbolic / property / economic evidence survives into a report – and disclosure stays in human hands.</p>
 
     <div class="panel arch">
       <pre class="mermaid" id="mermaid-diagram">
@@ -790,7 +790,7 @@ flowchart LR
       <p class="ethics">
         Research &amp; educational concept; ships without credentials or live target lists, offensive defaults disabled.
         <span class="dot">·</span> Use only on testnet or contracts you are <b>explicitly authorized</b> to assess.
-        <span class="dot">·</span> Findings are disclosed responsibly and <b>manually</b> — the pipeline never auto-sends.
+        <span class="dot">·</span> Findings are disclosed responsibly and <b>manually</b> – the pipeline never auto-sends.
       </p>
       <div class="foot-links">
         <a href="https://github.com/DefaultPerson/audit-agents-system" target="_blank" rel="noopener noreferrer">github</a>
@@ -828,44 +828,44 @@ flowchart LR
       in_: "Runtime bytecode (no source, no ABI)",
       tr:  "Decompiles via Dedaub, with a bytecode / disassembly / storage-layout fallback for what it can't recover.",
       out: "A decompiled view + recovered selectors",
-      body: "Recovered function names are hints, never facts. The loop is told to trust selectors, storage, and on-fork behavior — not the decompiler's guesses at intent.",
+      body: "Recovered function names are hints, never facts. The loop is told to trust selectors, storage, and on-fork behavior – not the decompiler's guesses at intent.",
       flag: "// decompiled names are hints, not facts" },
     { idx: "03", kind: "evidence base", title: "Immutable artifact bundle", icon: "bundle",
       in_: "Decompiled view + on-chain reads at the snapshot",
-      tr:  "Freezes ground truth: selectors, storage layout, recent traces/events, balances, proxy-admin evidence — under schema evm-artifact-bundle/v1.",
+      tr:  "Freezes ground truth: selectors, storage layout, recent traces/events, balances, proxy-admin evidence – under schema evm-artifact-bundle/v1.",
       out: "A frozen, content-hashed bundle",
-      body: "Every later hypothesis must point back to a fact inside this bundle. That single rule is what keeps the debate honest — and it's what the gate checks against.",
+      body: "Every later hypothesis must point back to a fact inside this bundle. That single rule is what keeps the debate honest – and it's what the gate checks against.",
       flag: "// every claim must cite this bundle" },
     { idx: "04", kind: "Researcher ⇄ Skeptic", title: "Autoresearch loop", icon: "loop",
       in_: "The artifact bundle + six specialist goals",
       tr:  "Two different LLMs argue across domains. The Researcher proposes an attack; the Skeptic demands the missing fact. Bounded by iteration / cost / time budgets.",
       out: "Candidate hypotheses, each with a receipt",
       body: "Specialist domains are bounded goals, not permanent agents. Repeated rejections on the same missing fact raise a 'stuck' signal and trigger replanning.",
-      flag: "// see section 2 — step it through" },
+      flag: "// see section 2 – step it through" },
     { idx: "05", kind: "deterministic", title: "Consensus gate", icon: "gate",
       in_: "A proposed hypothesis",
       tr:  "Checks five required facts. All present → promote. Any missing → reject with the exact missing fact recorded.",
       out: "Either a validation candidate, or a logged rejection",
-      body: "This is plain deterministic code, not a model vote. A rejected hypothesis never reaches a validator and never reaches a report — it goes back to the loop.",
-      flag: "// see section 3 — flip the requirements" },
+      body: "This is plain deterministic code, not a model vote. A rejected hypothesis never reaches a validator and never reaches a report – it goes back to the loop.",
+      flag: "// see section 3 – flip the requirements" },
     { idx: "06", kind: "evidence-gated", title: "Validators", icon: "validate",
       in_: "A consensus hypothesis + a verification package",
       tr:  "Foundry fork → ItyFuzz → symbolic → property → economic. A stage promotes to VALIDATED only on the evidence marker.",
-      out: "A validated finding — or nothing",
+      out: "A validated finding – or nothing",
       body: "Each validator writes its output and is scanned for VALIDATED_EVIDENCE: true. Scaffold tests and empty fuzz runs are explicitly refused as evidence.",
-      flag: "// see section 4 — the ladder" },
+      flag: "// see section 4 – the ladder" },
     { idx: "07", kind: "internal", title: "Evidence-gated report", icon: "report",
       in_: "Validated findings only",
       tr:  "Assembles an internal report: hypothesis, reproducer, validator output, evidence manifest. Rejected and inconclusive items are kept as memory, not findings.",
       out: "An internal, reproducible report",
-      body: "If nothing validated, there is no report of a vulnerability — only a record of what was checked and rejected.",
+      body: "If nothing validated, there is no report of a vulnerability – only a record of what was checked and rejected.",
       flag: "// no reproducer = not a finding" },
     { idx: "08", kind: "human-in-the-loop", title: "Manual disclosure", icon: "disclose",
       in_: "An internal report",
       tr:  "A human reviews and discloses responsibly. There is no automated send path by design.",
       out: "Responsible disclosure (manual)",
       body: "Disclosure is deliberately outside the automation. The pipeline produces evidence; a person decides what to do with it.",
-      flag: "// disclosure is manual — never auto-sent", ok: true }
+      flag: "// disclosure is manual – never auto-sent", ok: true }
   ];
 
   /* ---------------- 1 · pipeline schematic ---------------- */
@@ -907,7 +907,7 @@ flowchart LR
     detail.className = "node-detail";
     detail.id = "detail-" + i;
     detail.setAttribute("role", "region");
-    detail.setAttribute("aria-label", s.title + " — mechanics");
+    detail.setAttribute("aria-label", s.title + " – mechanics");
     detail.innerHTML =
       '<div class="hd"><svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><g class="ic">' + ICONS[s.icon] + '</g></svg>' +
         escapeHtml(s.idx + " · " + s.title) +
@@ -960,17 +960,17 @@ flowchart LR
   // worked example: Truebit-class bonding-curve overflow (accounting / share-math)
   var TURNS = [
     { who: "Researcher →", cls: "r", domain: 2,
-      txt: 'Selector <code>0xd0e30db0</code>-style mint path prices via <code>getPurchasePrice()</code>. The bonding-curve multiply looks unchecked — could it overflow to a zero price?' },
+      txt: 'Selector <code>0xd0e30db0</code>-style mint path prices via <code>getPurchasePrice()</code>. The bonding-curve multiply looks unchecked – could it overflow to a zero price?' },
     { who: "Skeptic →", cls: "s", domain: 2,
-      txt: 'A hunch is not a hypothesis. Cite the selector in the artifact bundle and the storage slot the price reads from — prove the math is reachable.' },
+      txt: 'A hunch is not a hypothesis. Cite the selector in the artifact bundle and the storage slot the price reads from – prove the math is reachable.' },
     { who: "Researcher →", cls: "r", domain: 2,
       txt: 'Bundle confirms the selector and a <code>uint256</code> reserve slot with no SafeMath wrapper in the decompiled slice. Precondition: a crafted amount wraps the product to 0.' },
     { who: "Skeptic →", cls: "s", domain: 2,
-      txt: 'Then state the impact and how you would prove it — vaguely "bad math" earns nothing from the gate.' },
+      txt: 'Then state the impact and how you would prove it – vaguely "bad math" earns nothing from the gate.' },
     { who: "Researcher →", cls: "r", domain: 2,
       txt: 'Impact: zero price → free mint → reserves drained. Validation: Foundry pinned-fork test replaying the crafted mint; property check on the supply invariant.' },
     { who: "Gate ✓", cls: "g", domain: 2,
-      txt: 'All five present — selector · precondition · impact · validation method · supporting fact. Promote to the validator ladder.' }
+      txt: 'All five present – selector · precondition · impact · validation method · supporting fact. Promote to the validator ladder.' }
   ];
   var loopTurnsEl = document.getElementById("loop-turns");
   var loopDomainEl = document.getElementById("loop-domain");
@@ -1010,7 +1010,7 @@ flowchart LR
   }
   function loopReset() {
     loopStep = 0; loopTurnsEl.innerHTML = "";
-    if (loopDomainEl) loopDomainEl.innerHTML = 'domain · <b>—</b>';
+    if (loopDomainEl) loopDomainEl.innerHTML = 'domain · <b>–</b>';
     nextBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M5 4l10 8-10 8zM19 4v16"/></svg> Next turn';
     highlightDiagram(null);
     setDomainRail(-1);
@@ -1042,13 +1042,13 @@ flowchart LR
     { name: "Affected selector or fallback path", key: "affectedSelectors",
       ex: 'e.g. <code>0x3659cfe6</code> (upgradeTo) or a fallback dispatch path' },
     { name: "Explicit preconditions", key: "preconditions",
-      ex: 'the exact state the attack assumes — "reserve slot writable", "caller unprivileged"' },
+      ex: 'the exact state the attack assumes – "reserve slot writable", "caller unprivileged"' },
     { name: "Expected impact", key: "expectedImpact",
-      ex: 'concrete loss — "zero price → free mint → reserves drained"' },
+      ex: 'concrete loss – "zero price → free mint → reserves drained"' },
     { name: "A validation method", key: "validationMethods",
-      ex: 'how it would be proven — foundry_fork, ityfuzz, symbolic, property, economic' },
+      ex: 'how it would be proven – foundry_fork, ityfuzz, symbolic, property, economic' },
     { name: "≥1 supporting cheap fact", key: "evidenceRefs",
-      ex: 'a fact already in the artifact bundle — <code>selector:0x…</code>, a storage read' }
+      ex: 'a fact already in the artifact bundle – <code>selector:0x…</code>, a storage read' }
   ];
   var reqListEl = document.getElementById("gate-req-list");
   reqListEl.innerHTML = REQS.map(function (r, i) {
