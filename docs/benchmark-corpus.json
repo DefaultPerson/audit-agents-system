@@ -1,0 +1,123 @@
+{
+  "schemaVersion": "evm-benchmark-corpus/v1",
+  "name": "evm-closed-source-seed-candidates",
+  "cases": [
+    {
+      "id": "known-bsc-pancakebunny-20210519",
+      "kind": "known_exploit",
+      "chain": "bsc",
+      "targetAddress": "0x633e538ecf0bee1a18c2edfe10c4da0d6e71e77b",
+      "snapshotBlock": 7556330,
+      "expectedClass": "oracle_price_liquidity",
+      "notes": "DeFiHackLabs src/test/2021-05/PancakeBunny_exp.sol; VaultFlipToFlip price/oracle manipulation reproduction."
+    },
+    {
+      "id": "known-bsc-uranium-20210428",
+      "kind": "known_exploit",
+      "chain": "bsc",
+      "targetAddress": "0xa943ea143cd7e79806d670f4a7cf08f8922a454f",
+      "snapshotBlock": 6920000,
+      "expectedClass": "accounting_share_math",
+      "notes": "DeFiHackLabs src/test/2021-04/Uranium_exp.sol; factory root for AMM pair miscalculation corpus entry."
+    },
+    {
+      "id": "known-eth-harvest-20201026",
+      "kind": "known_exploit",
+      "chain": "eth",
+      "targetAddress": "0xf0358e8c3cd5fa238a29301d0bea3d63a17bedbe",
+      "snapshotBlock": 11129473,
+      "expectedClass": "oracle_price_liquidity",
+      "notes": "DeFiHackLabs src/test/2020-10/HarvestFinance_exp.sol; fUSDC vault price manipulation reproduction."
+    },
+    {
+      "id": "known-eth-nomad-replica-20220802",
+      "kind": "known_exploit",
+      "chain": "eth",
+      "targetAddress": "0x5d94309e5a0090b165fa4181519701637b6daeba",
+      "snapshotBlock": 15259100,
+      "expectedClass": "state_machine_lifecycle",
+      "notes": "DeFiHackLabs src/test/2022-08/NomadBridge_exp.sol; Replica proxy trusted zero root/process replay."
+    },
+    {
+      "id": "known-eth-euler-edai-20230313",
+      "kind": "known_exploit",
+      "chain": "eth",
+      "targetAddress": "0xe025e3ca2be02316033184551d4d3aa22024d9dc",
+      "snapshotBlock": 16817995,
+      "expectedClass": "accounting_share_math",
+      "notes": "DeFiHackLabs src/test/2023-03/Euler_exp.sol; eDAI donateToReserves/liquidation invariant path."
+    },
+    {
+      "id": "benign-eth-weth9",
+      "kind": "benign_trap",
+      "chain": "eth",
+      "targetAddress": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "snapshotBlock": 16817995,
+      "expectedClass": "benign_canonical_token",
+      "notes": "Canonical WETH9; useful false-positive trap for value-moving selectors."
+    },
+    {
+      "id": "benign-eth-dai-token",
+      "kind": "benign_trap",
+      "chain": "eth",
+      "targetAddress": "0x6b175474e89094c44da98b954eedeac495271d0f",
+      "snapshotBlock": 16817995,
+      "expectedClass": "benign_canonical_token",
+      "notes": "Canonical DAI token at Euler-era snapshot; trap for generic mint/burn/auth claims."
+    },
+    {
+      "id": "benign-eth-usdc-token",
+      "kind": "benign_trap",
+      "chain": "eth",
+      "targetAddress": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "snapshotBlock": 16817995,
+      "expectedClass": "benign_proxy_token",
+      "notes": "Canonical USDC token/proxy; trap for proxy/admin claims without fork validation."
+    },
+    {
+      "id": "benign-bsc-usdt-token",
+      "kind": "benign_trap",
+      "chain": "bsc",
+      "targetAddress": "0x55d398326f99059ff775485246999027b3197955",
+      "snapshotBlock": 48123456,
+      "expectedClass": "benign_canonical_token",
+      "notes": "BSC USDT at recent snapshot; trap for closed-source token heuristics."
+    },
+    {
+      "id": "benign-bsc-pancakeswap-router",
+      "kind": "benign_trap",
+      "chain": "bsc",
+      "targetAddress": "0x10ed43c718714eb63d5aa57b78b54704e256024e",
+      "snapshotBlock": 48123456,
+      "expectedClass": "benign_router",
+      "notes": "PancakeSwap V2 router; trap for external-call/reentrancy noise."
+    },
+    {
+      "id": "edge-eth-nomad-router-proxy",
+      "kind": "edge_case",
+      "chain": "eth",
+      "targetAddress": "0x88a69b4e698a4b090df6cf5bd7b2d47325ad30a3",
+      "snapshotBlock": 15259100,
+      "expectedClass": "proxy_storage_delegatecall",
+      "notes": "Nomad BridgeRouter proxy from DeFiHackLabs notes; proxy edge case connected to Replica incident."
+    },
+    {
+      "id": "edge-eth-euler-main-proxy",
+      "kind": "edge_case",
+      "chain": "eth",
+      "targetAddress": "0x27182842e098f60e3d576794a5bffb0777e025d3",
+      "snapshotBlock": 16817995,
+      "expectedClass": "proxy_storage_delegatecall",
+      "notes": "Euler protocol root address from DeFiHackLabs Euler_exp.sol; module/proxy routing edge case."
+    },
+    {
+      "id": "edge-bsc-pancake-v2-pair",
+      "kind": "edge_case",
+      "chain": "bsc",
+      "targetAddress": "0x16b9a82891338f9ba80e2d6970fdda79d1eb0dae",
+      "snapshotBlock": 7556330,
+      "expectedClass": "oracle_price_liquidity",
+      "notes": "Pancake WBNB/USDT pair used by PancakeBunny reproduction; liquidity-context edge case."
+    }
+  ]
+}

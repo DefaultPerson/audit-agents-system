@@ -1,0 +1,87 @@
+# ============================================
+# Secrets & Environment
+# ============================================
+.env
+.env.*
+!.env.example
+!**/.env.example
+
+# ============================================
+# Python
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# ============================================
+# Foundry / Forge
+# ============================================
+out/
+cache/
+**/lib/forge-std/
+
+# ============================================
+# Rust
+# ============================================
+snapshot-extractor/target/
+Cargo.lock
+!snapshot-extractor/Cargo.lock
+
+# ============================================
+# Data (regenerable / local)
+# ============================================
+data/
+backend/data/
+audit-agents/data/DeFiHackLabs/
+audit-agents/data/rag/
+audit-agents/data/pipeline.log
+audit-agents/data/targets.db
+audit-agents/data/gigahorse-cache/
+audit-agents/data/context/
+audit-agents/audits/
+audit-agents/poc/
+audit-agents/lib/
+audits/
+*.db
+*.sqlite
+*.sqlite3
+*.lance
+*.txn
+*.manifest
+
+# ============================================
+# Claude / MCP
+# ============================================
+.claude/backups/
+.claude/settings.local.json
+.mcp.json
+
+# ============================================
+# Logs
+# ============================================
+logs/
+*.log
+
+# ============================================
+# IDE
+# ============================================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ============================================
+# OS
+# ============================================
+.DS_Store
+Thumbs.db
