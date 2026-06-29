@@ -21,35 +21,13 @@ venv/
 .mypy_cache/
 .coverage
 htmlcov/
-
-# ============================================
-# Foundry / Forge
-# ============================================
-out/
-cache/
-**/lib/forge-std/
-
-# ============================================
-# Rust
-# ============================================
-snapshot-extractor/target/
-Cargo.lock
-!snapshot-extractor/Cargo.lock
+dist/
+build/
 
 # ============================================
 # Data (regenerable / local)
 # ============================================
 data/
-backend/data/
-audit-agents/data/DeFiHackLabs/
-audit-agents/data/rag/
-audit-agents/data/pipeline.log
-audit-agents/data/targets.db
-audit-agents/data/gigahorse-cache/
-audit-agents/data/context/
-audit-agents/audits/
-audit-agents/poc/
-audit-agents/lib/
 audits/
 *.db
 *.sqlite
@@ -59,29 +37,18 @@ audits/
 *.manifest
 
 # ============================================
-# Claude / MCP
-# ============================================
-.claude/backups/
-.claude/settings.local.json
-.mcp.json
-
-# ============================================
 # Logs
 # ============================================
 logs/
 *.log
 
 # ============================================
-# IDE
+# IDE / OS
 # ============================================
 .idea/
 .vscode/
 *.swp
 *.swo
 *~
-
-# ============================================
-# OS
-# ============================================
 .DS_Store
 Thumbs.db

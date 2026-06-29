@@ -2,7 +2,7 @@
 
 **An AI agent pipeline that autonomously researches vulnerabilities in closed-source EVM smart contracts — published as a concept demonstration.**
 
-[**▶ Live demo**](https://defaultperson.github.io/audit-agents-system/) · [Methodology](docs/) · [Reference code](audit-agents/)
+[**▶ Live demo**](https://defaultperson.github.io/audit-agents-system/) · [Reference code](src/)
 
 > ⚠️ **Research & educational concept.** This repository demonstrates a *methodology*. It is **not** a turnkey tool: it ships with no credentials and no live target lists, and the offensive defaults are disabled. Use only on testnets or contracts you are explicitly authorized to assess. Findings are meant to be disclosed responsibly and **manually** — the pipeline never contacts a contract owner on its own.
 
@@ -48,8 +48,7 @@ flowchart LR
 ## Explore
 
 - **[Live demo →](https://defaultperson.github.io/audit-agents-system/)** — animated walkthrough of the pipeline.
-- **[`audit-agents/`](audit-agents/)** — the reference implementation (Python 3.12 + `uv`).
-- **[`docs/`](docs/)** — methodology deep-dive: design decisions, OSS-stack and model matrices, the agent-loop contract, and the benchmark corpus.
+- **[`src/`](src/)** — the reference implementation (Python 3.12): the autoresearch loop, evidence gate, validators, RAG, and chain adapters, shown as illustration.
 
 ## License
 
