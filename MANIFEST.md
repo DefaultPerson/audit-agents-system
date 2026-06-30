@@ -2,92 +2,67 @@
 
 A detailed walk through the autonomous audit workflow this repo demonstrates: how a closed-source EVM contract goes from a raw on-chain snapshot to a testnet-proven proof of concept, without a human reading the bytecode first.
 
-This is a **research/educational concept**. It is evidence-gated by design – a model's opinion is never a finding – and disclosure is always manual. See [SECURITY.md](SECURITY.md).
+The stages below map 1:1 to the **[interactive demo](https://defaultperson.github.io/audit-agents-system/)** – same names, same order. The whole thing optimizes for *reproducible evidence*, not a confident-sounding answer: every stage either produces a fact or kills the lead.
 
-The core idea: the loop optimizes for *reproducible evidence*, not for a confident-sounding answer. Every stage either produces a fact or kills the lead.
-
----
-
-## 1. Snapshot & select
-
-Pin an EVM chain at a specific block and pull a snapshot, then rank contracts by value and risk. The signal that matters most:
-
-- **Closed-source (unverified) bytecode** – no published source, so no human and almost no tool has really looked at it.
-- **Old** – deployed years ago, on a compiler nobody would ship today, with assumptions that have since broken.
-- **Holding value** – a balance or TVL large enough to be worth the compute.
-
-Contracts are grouped into **clone families** by bytecode hash, so one finding can fan out across every identical deployment. Proxies are resolved to their implementation before anything else.
-
-> Truebit (Jan 2026, ~$26M) is the archetype: a ~5-year-old, unverified, unaudited contract still holding 8,540 ETH.
-
-## 2. Decompile & bundle
-
-Recover something readable from the bytecode. **Dedaub** is the primary decompiler today; behind it sit fallbacks so the loop never depends on one tool's guesses:
-
-- disassembly / control-flow recovery,
-- selector & interface recovery,
-- storage-layout extraction,
-- raw storage reads, recent traces, logs, balances.
-
-All of this is frozen into an **immutable artifact bundle** – the single source of truth for the rest of the run. Hard rule: **decompiled names are hints, not facts.** A hypothesis must point at a selector, a storage slot, a trace, or on-fork behavior – never at a function name the decompiler invented.
-
-## 3. Research – the long, parallel part
-
-This is where the agents run. A cheap **goal planner** carves the contract into bounded objectives, one per specialist domain:
-
-- auth & upgradeability,
-- proxy, storage & delegatecall,
-- accounting, share math & rounding,
-- oracle, price & liquidity,
-- state machine & lifecycle,
-- external calls, callbacks & reentrancy.
-
-For each goal, two **different model families** argue instead of agree:
-
-- a **Researcher** proposes 1–3 concrete attack hypotheses, each tied to a selector and a precondition;
-- a **Skeptic** attacks them – missing access-control checks, wrong state assumptions, impact that doesn't actually pay after gas.
-
-They iterate, long-running and in parallel across goals. Cheap context tools (selector lookup, storage read, `cast call`, trace read) are allowed *before* consensus to settle arguments. Dead ends are written to a **rejected-hypothesis memory** so later runs don't re-explore them.
-
-## 4. The consensus gate
-
-A hypothesis only leaves the debate when it is concrete enough to build validation code. The gate is **deterministic** – plain code, not a model vote – and promotes a hypothesis only when **all five** hold:
-
-1. an affected **selector** (or fallback path),
-2. explicit **preconditions**,
-3. a concrete **expected impact**,
-4. a **validation method**,
-5. at least one **supporting fact** that actually exists in the artifact bundle.
-
-Miss any one and the hypothesis goes back to the loop with the reason attached. This is the line between "interesting idea" and "candidate worth money."
-
-## 5. Validate
-
-The creative stage – confirm or kill each candidate with *evidence*, escalating only as needed:
-
-1. **Foundry pinned-fork test** – reproduce the exploit against real state at the snapshot block (baseline, mandatory).
-2. **ItyFuzz** – bytecode-level exploit search.
-3. **Symbolic** (Mythril / Halmos) – bounded proofs where a property can be expressed.
-4. **Economic checks** – profit after gas, liquidity, slippage, fee-on-transfer, oracle-manipulation cost.
-
-A passing empty test is not evidence. Reasoning-only hypotheses never become findings; only fork/fuzz/symbolic/economic results survive into a report.
-
-## 6. Build, deploy & prove (testnet)
-
-For the candidates that survive validation, write the reproduction/exploit code, deploy it, and exercise it **on a testnet** (or a pinned fork) to prove impact end to end – **never against live third-party funds.**
-
-## 7. Disclosure
-
-Findings worth reporting are disclosed **manually** and responsibly: a human decides what to do with the evidence. The pipeline produces the evidence package; it never contacts an owner on its own.
+This is a **research/educational concept** – testnet only, and disclosure is always manual. See [SECURITY.md](SECURITY.md).
 
 ---
 
-### Stop conditions
+## 01 · Snapshot & Filter — Target Sourcing
 
-A target run ends when it hits the iteration / cost / time budget, when several rounds produce no new hypotheses, when a validated high/critical finding is found, or when the target is marked low-signal after enough cheap checks.
+Sync a full EVM snapshot, then mine it for the most promising prey: closed-source contracts, old and untouched, that still hold real funds.
+
+- **Full-node snapshot** – the whole chain, local and queryable offline, so every deployed contract can be scanned without rate limits.
+- **Criteria filter** – rank by *closed-source (unverified)* + *age* + *idle TVL*. Old and unaudited scores highest: nobody has the source, the compiler is years stale, and nobody is watching.
+- **Candidate queue** – the narrowed set is streamed downstream; proxies are resolved to their implementation and identical bytecode is grouped into clone families so one finding can fan out.
+
+Illustrative funnel: ~18M indexed contracts → closed-source + age > 3y → ~215k → idle TVL > $50k → **~1,900 candidates**.
+
+## 02 · Decompile — Dedaub Recovery
+
+Push each candidate through **Dedaub**, the strongest EVM decompiler today, and recover code that often reads almost like the original source.
+
+- **Dedaub engine** – lifts raw bytecode into high-level, typed, named pseudo-Solidity with control flow recovered.
+- **Selectors + storage** – function signatures and storage layout are reconstructed; external functions become the list of entrypoints to attack.
+- **Clean enough to read** – the output is good enough for an agent to reason over directly. Hard rule: recovered names are *hints, not facts* – a real finding must point at a selector, a storage slot, or on-fork behavior.
+
+## 03 · Agent Swarm — Parallel Auto-Research
+
+Spawn a swarm of long-running agents across **Opus, GLM and Codex**. They hammer every function in parallel, and cross-check each other, so only findings that more than one model reaches survive.
+
+- **Fan-out per function** – one or more agents are assigned to every entrypoint.
+- **Multi-model** – the same target is probed by different model families at once; they argue rather than agree.
+- **Long-horizon loop** – agents keep forming, testing and discarding hypotheses on a long budget.
+- **Peer-verify** – a hypothesis only counts when a *second* model independently reaches it. Example: Opus flags `price()` overflowing to `0`, GLM re-derives the same bug, Codex writes a PoC and attacks it – and it holds.
+
+This cross-model agreement is the quality gate: a single model's hunch is not yet a finding.
+
+## 04 · Validate — Creative Triage
+
+The creative step. Promising hypotheses get pressure-tested every which way and the noise is thrown out.
+
+- **Multiple angles** – static recheck, fresh reasoning from scratch, quick simulation probes.
+- **Cross-model vote** – findings that several models reach independently rank highest.
+- **Keep / discard** – only the survivors move on, and most don't. Illustrative: 41 candidate hypotheses → 38 discarded as noise/unreachable → **3 survive** into the exploit queue.
+
+There is no single recipe here – it is deliberately a judgement-heavy stage – but reasoning alone never survives it.
+
+## 05 · Exploit & Testnet — PoC on Testnet
+
+For the best survivors, write the actual exploit, deploy it, and fire it on a testnet fork to prove the bug is real – safely, before anything touches mainnet.
+
+- **Write the exploit** – an agent drafts a runnable PoC for each kept finding.
+- **Deploy to testnet** – a fork reproduces real state at the target block, so there is no mainnet risk.
+- **Prove impact** – run it, measure the attacker's balance delta, and confirm the contract actually drains. A finding is "confirmed" only with a measured, testnet-only result.
+
+---
+
+### After the loop
+
+A target run ends when it hits its iteration / cost / time budget, when rounds stop producing new hypotheses, when a confirmed finding lands, or when the target is marked low-signal. Anything worth reporting is disclosed **manually and responsibly** – the pipeline produces the evidence package; a human decides what to do with it.
 
 ### Why it scales
 
-The whole thing is chain-agnostic (EVM adapters) and the Researcher ⇄ Skeptic loop is domain-agnostic – the same shape that, in May 2026, let Opus 4.8 autonomously find a four-year-old soundness bug in Zcash's Orchard pool.
+The pipeline is chain-agnostic (EVM adapters) and the swarm is domain-agnostic – the same shape of autonomous research that, in May 2026, let Opus 4.8 independently find a four-year-old soundness bug in Zcash's Orchard pool.
 
 → Interactive walkthrough: <https://defaultperson.github.io/audit-agents-system/>
