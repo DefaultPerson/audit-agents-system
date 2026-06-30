@@ -1,10 +1,10 @@
 # Autonomous Audit Agents
 
 <p align="center">
-  <video src="https://github.com/DefaultPerson/audit-agents-system/raw/main/assets/audit-workflow.mp4" controls muted loop width="760"></video>
+  <a href="https://defaultperson.github.io/audit-agents-system/"><img src="assets/audit-workflow.gif" alt="Autonomous audit workflow" width="760"></a>
 </p>
 
-<sub>▶ If the video doesn't play inline, [watch it here](assets/audit-workflow.mp4) · or open the [interactive demo](https://defaultperson.github.io/audit-agents-system/).</sub>
+<sub>▶ [Full video](assets/audit-workflow.mp4) · [interactive demo](https://defaultperson.github.io/audit-agents-system/)</sub>
 
 **An AI agent pipeline that autonomously researches vulnerabilities in closed-source EVM smart contracts – a concept demonstration.**
 
