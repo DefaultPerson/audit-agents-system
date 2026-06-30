@@ -6,9 +6,9 @@
 
 **An AI agent pipeline that autonomously researches vulnerabilities in closed-source EVM smart contracts – a concept demonstration.**
 
-[**▶ Live demo – how it works**](https://defaultperson.github.io/audit-agents-system/) · [Workflow manifest](MANIFEST.md)
+[**Live demo – how it works**](https://defaultperson.github.io/audit-agents-system/) // [Workflow manifest](MANIFEST.md)
 
-> ⚠️ Research & educational concept. Ships with no credentials, no target lists, and with the offensive defaults disabled. Use only on testnet or contracts you are authorized to assess; disclosure is manual.
+> Research & educational concept. Ships with no credentials, no target lists, and with the offensive defaults disabled. Use only on testnet or contracts you are authorized to assess; disclosure is manual.
 
 ## Why
 
@@ -25,11 +25,6 @@ How are so many bugs being found and drained so fast – often in *old, closed-s
 This repo is **one hypothesis about how**: that part of the wave is automated, AI-driven vulnerability research at scale. *([Speculation] – a concept demonstration of a plausible method, not a claim about any specific attacker.)*
 
 The capability is clearly real: in May 2026, Anthropic's Opus 4.8, running an autonomous auditing agent, independently found a four-year-old soundness bug in Zcash's Orchard pool. This repo points that same autonomous-research loop at closed-source EVM contracts.
-
-## Explore
-
-- **[Live demo →](https://defaultperson.github.io/audit-agents-system/)** – interactive walkthrough of the method.
-- **[`src/`](src/)** – the reference implementation (Python 3.12), shown as illustration.
 
 ## License
 
